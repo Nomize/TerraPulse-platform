@@ -1,11 +1,11 @@
 {
-  "name": "TerraPulse - AI Land Regeneration",
+  "name": "TerraPulse - AI-Powered Land Regeneration",
   "short_name": "TerraPulse",
-  "description": "Monitor land health and predict degradation with AI-powered insights",
+  "description": "Monitor land health, detect degradation, and drive restoration with satellite imagery and machine learning",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F9FAFB",
-  "theme_color": "#10B981",
+  "background_color": "#0A0A0A",
+  "theme_color": "#00FF41",
   "orientation": "portrait-primary",
   "icons": [
     {

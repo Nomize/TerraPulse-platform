@@ -15,6 +15,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -57,6 +59,8 @@ export default {
           moderate: "hsl(var(--status-moderate))",
           risk: "hsl(var(--status-risk))",
         },
+        warning: "hsl(var(--warning))",
+        success: "hsl(var(--success))",
         chart: {
           1: "hsl(var(--chart-1))",
           2: "hsl(var(--chart-2))",
@@ -72,6 +76,12 @@ export default {
       },
       boxShadow: {
         'glow': 'var(--shadow-glow)',
+        'glow-lg': 'var(--shadow-glow-lg)',
+        'glow-strong': 'var(--shadow-glow-strong)',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'cyber-grid': 'linear-gradient(hsl(127 100% 50% / 0.1) 1px, transparent 1px), linear-gradient(90deg, hsl(127 100% 50% / 0.1) 1px, transparent 1px)',
       },
       keyframes: {
         "accordion-down": {
@@ -90,12 +100,22 @@ export default {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "pulse-glow": {
+          '0%, 100%': { boxShadow: '0 0 20px hsl(127 100% 50% / 0.3)' },
+          '50%': { boxShadow: '0 0 40px hsl(127 100% 50% / 0.6)' },
+        },
+        scan: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(100%)' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
         "fade-in": "fade-in 0.5s ease-out",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "scan": "scan 2s linear infinite",
       },
     },
   },

@@ -8,97 +8,67 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Earth-tone color palette for TerraPulse */
-    --background: 210 20% 98%;
-    --foreground: 160 10% 15%;
+    /* Black & Green Cyber Theme for TerraPulse v2 */
+    --background: 0 0% 4%; /* #0A0A0A */
+    --foreground: 0 0% 90%; /* #E5E7EB */
 
-    --card: 0 0% 100%;
-    --card-foreground: 160 10% 15%;
+    --card: 0 0% 7%; /* #121212 */
+    --card-foreground: 0 0% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 160 10% 15%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 90%;
 
-    /* Primary: Earth Green */
-    --primary: 160 84% 39%;
-    --primary-dark: 160 84% 30%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: Matrix Green */
+    --primary: 127 100% 50%; /* #00FF41 */
+    --primary-dark: 127 100% 40%;
+    --primary-foreground: 0 0% 4%;
 
-    /* Secondary: Soil Brown */
-    --secondary: 25 90% 30%;
-    --secondary-dark: 24 90% 26%;
+    /* Secondary: Forest Green */
+    --secondary: 160 84% 39%; /* #10B981 */
+    --secondary-dark: 160 84% 30%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Accent: Sky Blue */
-    --accent: 199 89% 48%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent: Neon Green */
+    --accent: 127 100% 54%; /* #39FF14 */
+    --accent-foreground: 0 0% 4%;
 
-    --muted: 210 20% 95%;
-    --muted-foreground: 160 5% 45%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 62%; /* #9CA3AF */
 
-    /* Warning: Red for alerts */
-    --destructive: 0 72% 60%;
+    /* Warning colors */
+    --destructive: 0 100% 62%; /* #FF3B3B */
+    --warning: 30 100% 50%; /* #FF8C00 */
+    --success: 152 100% 45%; /* #00E676 */
+    
     --destructive-foreground: 0 0% 100%;
 
-    --border: 160 20% 88%;
-    --input: 160 20% 90%;
-    --ring: 160 84% 39%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 127 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     /* Custom gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(160 84% 30%) 100%);
-    --gradient-earth: linear-gradient(180deg, hsl(160 50% 95%) 0%, hsl(25 30% 95%) 100%);
-    --gradient-sky: linear-gradient(135deg, hsl(199 89% 48%) 0%, hsl(160 84% 39%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 4%) 0%, hsl(152 70% 15%) 100%);
+    --gradient-card: linear-gradient(to right, hsl(127 100% 50%), hsl(160 84% 39%));
+    --gradient-cyber: linear-gradient(135deg, hsl(0 0% 7%) 0%, hsl(127 100% 50% / 0.1) 100%);
     
-    /* Chart colors */
-    --chart-1: 160 84% 39%;
-    --chart-2: 199 89% 48%;
-    --chart-3: 25 90% 30%;
-    --chart-4: 0 72% 60%;
-    --chart-5: 160 50% 60%;
+    /* Chart colors - Green spectrum */
+    --chart-1: 127 100% 50%; /* Matrix Green */
+    --chart-2: 160 84% 39%; /* Forest Green */
+    --chart-3: 152 100% 45%; /* Success Green */
+    --chart-4: 0 100% 62%; /* Risk Red */
+    --chart-5: 30 100% 50%; /* Warning Orange */
 
     /* Status colors */
-    --status-healthy: 160 84% 39%;
-    --status-moderate: 45 93% 47%;
-    --status-risk: 0 72% 60%;
+    --status-healthy: 152 100% 45%;
+    --status-moderate: 30 100% 50%;
+    --status-risk: 0 100% 62%;
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(160 10% 0% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(160 10% 0% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(160 10% 0% / 0.1);
-    --shadow-glow: 0 0 20px hsl(160 84% 39% / 0.3);
-  }
-
-  .dark {
-    --background: 160 15% 10%;
-    --foreground: 160 10% 95%;
-
-    --card: 160 15% 12%;
-    --card-foreground: 160 10% 95%;
-
-    --popover: 160 15% 12%;
-    --popover-foreground: 160 10% 95%;
-
-    --primary: 160 84% 45%;
-    --primary-dark: 160 84% 35%;
-    --primary-foreground: 160 10% 10%;
-
-    --secondary: 25 90% 35%;
-    --secondary-dark: 24 90% 30%;
-    --secondary-foreground: 0 0% 100%;
-
-    --accent: 199 89% 55%;
-    --accent-foreground: 0 0% 100%;
-
-    --muted: 160 10% 20%;
-    --muted-foreground: 160 5% 65%;
-
-    --destructive: 0 72% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 160 15% 20%;
-    --input: 160 15% 20%;
-    --ring: 160 84% 45%;
+    /* Glow effects */
+    --shadow-glow: 0 0 20px hsl(127 100% 50% / 0.3);
+    --shadow-glow-lg: 0 0 40px hsl(127 100% 50% / 0.4);
+    --shadow-glow-strong: 0 0 30px hsl(127 100% 50% / 0.6);
   }
 }
 
@@ -109,10 +79,13 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(127 100% 50% / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, hsl(160 84% 39% / 0.03) 0%, transparent 50%);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
+    @apply font-heading font-bold tracking-tight;
   }
 }
 
@@ -121,20 +94,52 @@ All colors MUST be HSL.
     background: var(--gradient-hero);
   }
   
-  .gradient-earth {
-    background: var(--gradient-earth);
+  .gradient-card {
+    background: var(--gradient-card);
   }
   
-  .gradient-sky {
-    background: var(--gradient-sky);
+  .gradient-cyber {
+    background: var(--gradient-cyber);
   }
 
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
 
+  .shadow-glow-lg {
+    box-shadow: var(--shadow-glow-lg);
+  }
+
+  .shadow-glow-strong {
+    box-shadow: var(--shadow-glow-strong);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px hsl(127 100% 50% / 0.5);
+  }
+
+  .border-glow {
+    border-color: hsl(127 100% 50%);
+    box-shadow: 0 0 10px hsl(127 100% 50% / 0.3);
+  }
+
+  .cyber-grid {
+    background-image: 
+      linear-gradient(hsl(127 100% 50% / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(127 100% 50% / 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-scan {
+    animation: scan 2s linear infinite;
   }
 
   @keyframes float {
@@ -142,7 +147,23 @@ All colors MUST be HSL.
     50% { transform: translateY(-20px); }
   }
 
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(127 100% 50% / 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 40px hsl(127 100% 50% / 0.6);
+    }
+  }
+
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  .glass-card {
+    background: hsl(0 0% 7% / 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(127 100% 50% / 0.2);
   }
 }
