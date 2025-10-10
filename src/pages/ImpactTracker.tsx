@@ -190,7 +190,7 @@ const ImpactTracker = () => {
                     placeholder="e.g., Lagos, Nigeria"
                   />
                 </div>
-                <Button type="submit" className="w-full gradient-hero">
+                <Button type="submit" className="w-full">
                   <TrendingUp className="h-4 w-4 mr-2" />
                   Log Activity & Earn Points
                 </Button>

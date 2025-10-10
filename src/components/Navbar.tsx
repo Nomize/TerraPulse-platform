@@ -20,13 +20,13 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        {/* Logo */}
+        {/* Logo with Pulsing Animation */}
         <Link to="/" className="flex items-center space-x-2 group">
-          <div className="relative">
-            <Leaf className="h-8 w-8 text-primary transition-transform group-hover:scale-110" />
-            <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/40 transition-all"></div>
+          <div className="relative w-10 h-10">
+            <Leaf className="absolute inset-0 w-10 h-10 text-primary animate-pulse" />
+            <Leaf className="absolute inset-0 w-10 h-10 text-primary opacity-50 animate-ping" />
           </div>
-          <span className="text-xl font-heading font-bold text-glow">TerraPulse</span>
+          <span className="text-xl font-heading font-bold text-white">TerraPulse</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -49,15 +49,15 @@ const Navbar = () => {
         {/* Right Section - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
           <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
-            <Search className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+            <Search className="h-5 w-5 text-primary" />
           </Button>
           <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
-            <Bell className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+            <Bell className="h-5 w-5 text-primary" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse shadow-glow"></span>
           </Button>
           <Button variant="ghost" size="icon" className="hover:bg-primary/10">
             <div className="relative">
-              <User className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+              <User className="h-5 w-5 text-primary" />
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success border-2 border-background rounded-full"></div>
             </div>
           </Button>

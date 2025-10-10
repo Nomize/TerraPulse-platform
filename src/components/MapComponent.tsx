@@ -23,7 +23,7 @@ const MapComponent = () => {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "mapbox://styles/mapbox/dark-v11",
       center: [7.0, 9.0], // Nigeria center
       zoom: 5.5,
     });
@@ -40,11 +40,17 @@ const MapComponent = () => {
           : "#10B981";
 
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <div style="padding: 8px;">
-          <h3 style="font-weight: bold; margin-bottom: 4px;">${location.name}</h3>
-          <p style="color: ${color}; font-weight: 600; text-transform: capitalize;">
-            ${location.risk} Risk
-          </p>
+        <div style="padding: 12px; background: #0F1419; border: 2px solid #00FF41; border-radius: 8px; min-width: 200px;">
+          <h3 style="font-weight: bold; margin-bottom: 8px; color: #FFFFFF; font-size: 16px;">${location.name}</h3>
+          <div style="display: flex; justify-between; align-items: center; margin-bottom: 8px;">
+            <span style="color: #A1A1AA; font-size: 12px;">Risk Level:</span>
+            <span style="color: ${color}; font-weight: 600; text-transform: uppercase; font-size: 14px;">
+              ${location.risk}
+            </span>
+          </div>
+          <button style="width: 100%; background: #00FF41; color: #000000; font-weight: 600; padding: 8px; border-radius: 6px; border: none; cursor: pointer; margin-top: 8px;">
+            View Details →
+          </button>
         </div>
       `);
 

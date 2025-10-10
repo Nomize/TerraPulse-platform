@@ -228,7 +228,7 @@ const AIInsights = () => {
                   placeholder="Ask about soil health, vegetation trends..."
                   className="flex-1"
                 />
-                <Button onClick={handleSend} className="gradient-hero">
+                <Button onClick={handleSend}>
                   <Send className="h-4 w-4" />
                 </Button>
               </div>

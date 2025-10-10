@@ -56,8 +56,9 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Last updated: {lastUpdate} seconds ago
+          <p className="text-muted-foreground mt-1 flex items-center gap-2">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-glow"></span>
+            Live data • Updated {lastUpdate} seconds ago
           </p>
         </div>
         <div className="flex gap-3">
@@ -65,7 +66,7 @@ const Dashboard = () => {
             <Download className="h-4 w-4 mr-2" />
             Export Report
           </Button>
-          <Button variant="outline" size="sm">
+          <Button size="sm">
             <RefreshCcw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -75,7 +76,7 @@ const Dashboard = () => {
       {/* Main Cards Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Card 1: Soil Health Score */}
-        <Card className="hover:shadow-glow transition-shadow">
+        <Card className="glass-card hover:shadow-glow-lg transition-all hover:border-primary/50 hover:-translate-y-1">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               Soil Health Score
@@ -148,14 +149,14 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <Button variant="outline" className="w-full">
+            <Button className="w-full">
               View Details
             </Button>
           </CardContent>
         </Card>
 
         {/* Card 2: Vegetation Index */}
-        <Card className="hover:shadow-glow transition-shadow">
+        <Card className="glass-card hover:shadow-glow-lg transition-all hover:border-primary/50 hover:-translate-y-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               Vegetation Index (NDVI)
@@ -210,7 +211,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <Button variant="outline" className="w-full">
+            <Button className="w-full">
               <Download className="h-4 w-4 mr-2" />
               Download Data
             </Button>
@@ -218,7 +219,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Card 3: Degradation Risk Map */}
-        <Card className="hover:shadow-glow transition-shadow lg:col-span-1">
+        <Card className="glass-card hover:shadow-glow-lg transition-all hover:border-primary/50 hover:-translate-y-1 lg:col-span-1">
           <CardHeader>
             <CardTitle>Degradation Risk Map</CardTitle>
             <CardDescription>Interactive risk zone monitoring</CardDescription>
@@ -250,7 +251,7 @@ const Dashboard = () => {
               </select>
             </div>
             <div className="flex-1 flex items-end">
-              <Button className="w-full gradient-hero">Apply Filters</Button>
+              <Button className="w-full">Apply Filters</Button>
             </div>
           </div>
         </CardContent>
