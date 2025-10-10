@@ -1,173 +1,263 @@
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { BarChart3, Brain, Users, ArrowRight, Sparkles } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Satellite, Brain, Sprout, TrendingUp, ArrowRight, Leaf, Activity, Database, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Index = () => {
-  const features = [
-    {
-      icon: BarChart3,
-      title: "Real-Time Monitoring",
-      description: "Track soil health and vegetation with live data analytics and customizable dashboards",
-    },
-    {
-      icon: Brain,
-      title: "AI Predictions",
-      description: "Leverage machine learning to predict degradation patterns and optimize restoration efforts",
-    },
-    {
-      icon: Users,
-      title: "Community Impact",
-      description: "Join a global movement with gamified tracking, badges, and collaborative restoration projects",
-    },
-  ];
+  const [animatedStats, setAnimatedStats] = useState({ hectares: 0, communities: 0, carbon: 0 });
 
-  const stats = [
-    { value: "1M+", label: "Hectares Monitored" },
-    { value: "500K+", label: "Data Points Daily" },
-    { value: "98%", label: "Prediction Accuracy" },
-  ];
+  useEffect(() => {
+    const animateStats = () => {
+      const duration = 2000;
+      const steps = 60;
+      const interval = duration / steps;
+      let step = 0;
+
+      const timer = setInterval(() => {
+        step++;
+        const progress = step / steps;
+        setAnimatedStats({
+          hectares: Math.floor(1000000 * progress),
+          communities: Math.floor(500 * progress),
+          carbon: Math.floor(2000000 * progress),
+        });
+
+        if (step >= steps) clearInterval(timer);
+      }, interval);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        animateStats();
+        observer.disconnect();
+      }
+    });
+
+    const statsElement = document.getElementById('stats-section');
+    if (statsElement) observer.observe(statsElement);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="w-full">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden gradient-hero py-24 md:py-32">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-64 h-64 bg-primary-foreground rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+      <section className="relative overflow-hidden gradient-hero min-h-screen flex items-center">
+        {/* Animated Grid Background */}
+        <div className="absolute inset-0 cyber-grid opacity-20"></div>
+        
+        {/* Floating Particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-primary rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${6 + Math.random() * 4}s`,
+              }}
+            />
+          ))}
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm px-4 py-2 rounded-full border border-primary-foreground/20">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
-              <span className="text-sm text-primary-foreground font-medium">
-                Built for LandReGen Hackathon
-              </span>
+        <div className="container relative z-10 text-center">
+          <h1 className="text-5xl md:text-7xl font-heading font-bold mb-6 text-glow animate-fade-in">
+            AI-Powered Insights for a <span className="text-primary">Greener Planet</span>
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            Monitor land health, detect degradation, and drive restoration with satellite imagery and machine learning
+          </p>
+
+          {/* Key Features Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+            <div className="glass-card p-6 rounded-lg animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <Satellite className="w-12 h-12 text-primary mx-auto mb-3" />
+              <h3 className="text-lg font-heading font-semibold mb-2">Satellite Monitoring</h3>
+              <p className="text-sm text-muted-foreground">Real-time remote sensing data</p>
             </div>
+            <div className="glass-card p-6 rounded-lg animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <Brain className="w-12 h-12 text-secondary mx-auto mb-3" />
+              <h3 className="text-lg font-heading font-semibold mb-2">AI Predictions</h3>
+              <p className="text-sm text-muted-foreground">Machine learning analytics</p>
+            </div>
+            <div className="glass-card p-6 rounded-lg animate-fade-in" style={{ animationDelay: '0.8s' }}>
+              <Sprout className="w-12 h-12 text-success mx-auto mb-3" />
+              <h3 className="text-lg font-heading font-semibold mb-2">Regeneration Plans</h3>
+              <p className="text-sm text-muted-foreground">Region-specific interventions</p>
+            </div>
+          </div>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground leading-tight">
-              AI-Powered Insights for a Greener Planet
-            </h1>
-
-            <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto">
-              Monitor land health, predict degradation, and drive restoration with real-time AI analytics
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '1s' }}>
+            <Button asChild size="lg" className="text-lg shadow-glow hover:shadow-glow-lg transition-all">
               <Link to="/dashboard">
-                <Button size="lg" variant="secondary" className="group text-base px-8">
-                  Get Started
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                Launch Dashboard <ArrowRight className="ml-2" />
               </Link>
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-base px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Learn More
-              </Button>
-            </div>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="text-lg border-primary hover:bg-primary/10">
+              <Link to="/ai-insights">Watch Demo</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Showcase */}
+      <section className="py-20 bg-card">
+        <div className="container">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Feature 1 */}
+            <Card className="glass-card border-primary/20 hover:border-primary/50 transition-all hover:-translate-y-2">
+              <CardHeader>
+                <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Activity className="w-8 h-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl font-heading">AI-Powered Land Health Dashboard</CardTitle>
+                <CardDescription className="text-base">
+                  Real-time vegetation cover (NDVI), soil moisture, erosion levels, and deforestation tracking via remote sensing data
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-48 bg-background rounded-lg flex items-center justify-center border border-primary/20">
+                  <div className="text-center">
+                    <div className="w-24 h-24 mx-auto mb-4 rounded-full border-4 border-primary/30 flex items-center justify-center animate-pulse-glow">
+                      <span className="text-3xl font-heading text-primary">68%</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Live Health Score</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Feature 2 */}
+            <Card className="glass-card border-secondary/20 hover:border-secondary/50 transition-all hover:-translate-y-2">
+              <CardHeader>
+                <div className="w-16 h-16 rounded-lg bg-secondary/10 flex items-center justify-center mb-4">
+                  <Brain className="w-8 h-8 text-secondary" />
+                </div>
+                <CardTitle className="text-2xl font-heading">Degradation Detection Model</CardTitle>
+                <CardDescription className="text-base">
+                  Time-series satellite analysis comparing historical data to detect soil depletion, vegetation loss, and water body shrinkage
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-48 bg-background rounded-lg flex items-center justify-center border border-secondary/20 relative overflow-hidden">
+                  <div className="absolute inset-0 animate-scan bg-gradient-to-b from-transparent via-primary/10 to-transparent"></div>
+                  <div className="relative z-10">
+                    <p className="text-primary font-mono text-sm mb-2">Analyzing satellite data...</p>
+                    <div className="flex gap-2 justify-center">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Feature 3 */}
+            <Card className="glass-card border-success/20 hover:border-success/50 transition-all hover:-translate-y-2">
+              <CardHeader>
+                <div className="w-16 h-16 rounded-lg bg-success/10 flex items-center justify-center mb-4">
+                  <Leaf className="w-8 h-8 text-success" />
+                </div>
+                <CardTitle className="text-2xl font-heading">Regenerative Recommendation Engine</CardTitle>
+                <CardDescription className="text-base">
+                  Region-specific interventions including reforestation strategies, organic fertilizer recommendations, and sustainable crop rotation
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {['Plant Acacia species', 'Implement composting', 'Contour plowing'].map((rec, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 bg-background rounded border border-success/20">
+                      <div className="w-2 h-2 bg-success rounded-full"></div>
+                      <span className="text-sm">{rec}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Feature 4 */}
+            <Card className="glass-card border-primary/20 hover:border-primary/50 transition-all hover:-translate-y-2">
+              <CardHeader>
+                <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <TrendingUp className="w-8 h-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl font-heading">Impact Simulation</CardTitle>
+                <CardDescription className="text-base">
+                  Predict biodiversity recovery, soil fertility improvement, and carbon sequestration gains before implementing solutions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-48 bg-background rounded-lg flex items-center justify-center border border-primary/20">
+                  <div className="text-center space-y-4">
+                    <div className="flex justify-around gap-8">
+                      <div>
+                        <p className="text-2xl font-mono text-destructive">42</p>
+                        <p className="text-xs text-muted-foreground">Before</p>
+                      </div>
+                      <ArrowRight className="text-primary self-center" />
+                      <div>
+                        <p className="text-2xl font-mono text-success">73</p>
+                        <p className="text-xs text-muted-foreground">After</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-primary">+31% Improvement</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center space-y-2">
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold">
-              Powerful Features for Climate Action
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to monitor, predict, and restore degraded land
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {features.map((feature, index) => (
-              <Card
-                key={index}
-                className="group hover:shadow-glow transition-all duration-300 border-border hover:border-primary/50"
-              >
-                <CardContent className="p-6 space-y-4">
-                  <div className="h-12 w-12 rounded-lg gradient-hero flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <feature.icon className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Indicators */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="space-y-3">
-              <h2 className="text-2xl md:text-4xl font-bold">
-                Trusted by Environmental Leaders
-              </h2>
-              <p className="text-muted-foreground">
-                Join farmers, NGOs, and scientists using TerraPulse
+      <section id="stats-section" className="py-20 bg-gradient-cyber">
+        <div className="container">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="glass-card p-8 rounded-lg">
+              <Database className="w-12 h-12 text-primary mx-auto mb-4" />
+              <p className="text-4xl font-heading font-bold text-primary mb-2">
+                {animatedStats.hectares.toLocaleString()}+
               </p>
+              <p className="text-muted-foreground">Hectares Monitored</p>
             </div>
-            
-            {/* Partner Logos Placeholder */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-16 bg-muted rounded-lg flex items-center justify-center">
-                  <span className="text-sm text-muted-foreground font-medium">Partner {i}</span>
-                </div>
-              ))}
+            <div className="glass-card p-8 rounded-lg">
+              <Users className="w-12 h-12 text-secondary mx-auto mb-4" />
+              <p className="text-4xl font-heading font-bold text-secondary mb-2">
+                {animatedStats.communities.toLocaleString()}+
+              </p>
+              <p className="text-muted-foreground">Communities Served</p>
+            </div>
+            <div className="glass-card p-8 rounded-lg">
+              <Leaf className="w-12 h-12 text-success mx-auto mb-4" />
+              <p className="text-4xl font-heading font-bold text-success mb-2">
+                {animatedStats.carbon.toLocaleString()}
+              </p>
+              <p className="text-muted-foreground">Tons CO₂ Sequestered</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
-          <Card className="gradient-sky border-0 shadow-glow">
-            <CardContent className="p-12 text-center space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-accent-foreground">
-                Ready to Make an Impact?
-              </h2>
-              <p className="text-lg text-accent-foreground/90 max-w-2xl mx-auto">
-                Start monitoring your land today and join the regeneration revolution
-              </p>
-              <Link to="/dashboard">
-                <Button size="lg" variant="secondary" className="text-base px-8">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+      {/* Footer CTA */}
+      <section className="py-20 text-center bg-card">
+        <div className="container">
+          <p className="text-sm text-primary mb-4 font-mono">Built for LandReGen Hackathon</p>
+          <h2 className="mb-4 text-3xl md:text-5xl font-heading font-bold text-glow">
+            Ready to Make a <span className="text-primary">Difference?</span>
+          </h2>
+          <p className="mb-8 text-lg text-muted-foreground max-w-2xl mx-auto">
+            Join the movement to restore our planet using cutting-edge AI and satellite technology
+          </p>
+          <Button asChild size="lg" className="text-lg shadow-glow-lg hover:shadow-glow-strong transition-all hover:scale-105">
+            <Link to="/dashboard">
+              Get Started Today <ArrowRight className="ml-2" />
+            </Link>
+          </Button>
         </div>
       </section>
     </div>
