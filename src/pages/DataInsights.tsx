@@ -10,6 +10,7 @@ import {
   Bar, 
   AreaChart, 
   Area,
+  ComposedChart,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -17,11 +18,16 @@ import {
   Legend,
   ResponsiveContainer 
 } from "recharts";
-import { Upload, Download, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
+import { Upload, Download, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, FileText, Grid3x3 } from "lucide-react";
 import { toast } from "sonner";
+import { exportToCSV, exportToPDF } from "@/lib/export-utils";
 
 const DataInsights = () => {
   const [activeTab, setActiveTab] = useState("soil");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedData, setUploadedData] = useState<any[] | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [viewMode, setViewMode] = useState<'chart' | 'heatmap'>('chart');
 
   // Mock data for different charts
   const soilMoistureData = [
@@ -58,12 +64,70 @@ const DataInsights = () => {
     { year: "2024", healthy: 71, moderate: 21, degraded: 8 },
   ];
 
-  const handleUpload = () => {
-    toast.success("File uploaded successfully! Analysis in progress...");
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadedFile(file);
+    setIsProcessing(true);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const rows = text.split('\n').map(row => row.split(','));
+      const headers = rows[0];
+      const data = rows.slice(1).map(row => {
+        const obj: any = {};
+        headers.forEach((header, i) => {
+          obj[header.trim()] = row[i]?.trim();
+        });
+        return obj;
+      }).filter(row => Object.values(row).some(val => val));
+
+      setTimeout(() => {
+        setUploadedData(data);
+        setIsProcessing(false);
+        toast.success(`Successfully processed ${data.length} rows!`);
+      }, 1500);
+    };
+    reader.readAsText(file);
   };
 
-  const handleAnalyze = () => {
-    toast.success("Analysis complete! Check the results below.");
+  const handleExportPDF = () => {
+    const reportHTML = `
+      <h2>Land Health Summary Report</h2>
+      <table>
+        <tr><th>Metric</th><th>Value</th><th>Status</th></tr>
+        <tr><td>Average Soil Health</td><td>73/100</td><td>Good</td></tr>
+        <tr><td>NDVI Average</td><td>0.68</td><td>Healthy</td></tr>
+        <tr><td>Healthy Land Coverage</td><td>71%</td><td>Improving (+26%)</td></tr>
+        <tr><td>Degraded Land</td><td>8%</td><td>Declining (-12%)</td></tr>
+      </table>
+      <h2>Key Insights</h2>
+      <ul>
+        <li>Soil moisture levels optimal in most monitored regions</li>
+        <li>Strong correlation between rainfall and vegetation (NDVI)</li>
+        <li>Lagos and Abuja show highest health scores (72-81)</li>
+        <li>Niger region requires attention with score of 45</li>
+      </ul>
+      <h2>Recommendations</h2>
+      <ul>
+        <li>Continue current land management practices in high-performing regions</li>
+        <li>Implement targeted restoration in Niger region</li>
+        <li>Monitor rainfall patterns for drought preparedness</li>
+        <li>Expand vegetation coverage in moderate-risk zones</li>
+      </ul>
+    `;
+    exportToPDF('TerraPulse Land Health Report', reportHTML);
+  };
+
+  const handleDownloadSample = () => {
+    const sampleData = [
+      { region: 'Lagos', ndvi: 0.72, soilHealth: 75, rainfall: 85 },
+      { region: 'Kano', ndvi: 0.58, soilHealth: 62, rainfall: 45 },
+      { region: 'Abuja', ndvi: 0.81, soilHealth: 85, rainfall: 92 },
+    ];
+    exportToCSV(sampleData, 'terrapulse_sample_data');
   };
 
   return (
@@ -77,9 +141,20 @@ const DataInsights = () => {
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
+          <Button 
+            onClick={handleExportPDF}
+            className="bg-gradient-to-r from-[#00FF41] to-[#10B981] text-black hover:shadow-[0_0_30px_rgba(0,255,65,0.6)]"
+          >
+            <FileText className="h-4 w-4 mr-2" />
             Export PDF
+          </Button>
+          <Button 
+            variant="outline"
+            onClick={() => exportToCSV(degradationByRegion, 'land_health_data')}
+            className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
           </Button>
         </div>
       </div>
@@ -161,54 +236,142 @@ const DataInsights = () => {
 
         {/* Vegetation Analysis Tab */}
         <TabsContent value="vegetation" className="space-y-6 mt-6">
-          <Card>
+          <Card className="bg-[#0F1419] border border-[#10B981]/30 hover:border-[#00FF41] transition-all">
             <CardHeader>
-              <CardTitle>Vegetation Change Over Time</CardTitle>
-              <CardDescription>Recovery and decline patterns by status</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-white">Vegetation Change Over Time</CardTitle>
+                  <CardDescription>Recovery and decline patterns by status</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant={viewMode === 'chart' ? 'default' : 'outline'}
+                    onClick={() => setViewMode('chart')}
+                    className={viewMode === 'chart' ? 'bg-[#00FF41] text-black' : 'border-[#00FF41] text-[#00FF41]'}
+                  >
+                    <TrendingUp className="h-4 w-4 mr-1" />
+                    Chart
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={viewMode === 'heatmap' ? 'default' : 'outline'}
+                    onClick={() => setViewMode('heatmap')}
+                    className={viewMode === 'heatmap' ? 'bg-[#00FF41] text-black' : 'border-[#00FF41] text-[#00FF41]'}
+                  >
+                    <Grid3x3 className="h-4 w-4 mr-1" />
+                    Heatmap
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => exportToCSV(vegetationChange, 'vegetation_trends')}
+                    className="border-[#00FF41] text-[#00FF41]"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <AreaChart data={vegetationChange}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="year" className="text-xs" />
-                  <YAxis className="text-xs" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="healthy"
-                    stackId="1"
-                    stroke="hsl(var(--status-healthy))"
-                    fill="hsl(var(--status-healthy))"
-                    fillOpacity={0.6}
-                    name="Healthy (%)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="moderate"
-                    stackId="1"
-                    stroke="hsl(var(--status-moderate))"
-                    fill="hsl(var(--status-moderate))"
-                    fillOpacity={0.6}
-                    name="Moderate (%)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="degraded"
-                    stackId="1"
-                    stroke="hsl(var(--status-risk))"
-                    fill="hsl(var(--status-risk))"
-                    fillOpacity={0.6}
-                    name="Degraded (%)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              {viewMode === 'chart' ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <AreaChart data={vegetationChange}>
+                    <defs>
+                      <linearGradient id="healthyGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--status-healthy))" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="hsl(var(--status-healthy))" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1A1F26" />
+                    <XAxis dataKey="year" stroke="#A1A1AA" />
+                    <YAxis stroke="#A1A1AA" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F1419",
+                        border: "2px solid #00FF41",
+                        borderRadius: "8px",
+                        color: "white"
+                      }}
+                    />
+                    <Legend />
+                    <Area
+                      type="monotone"
+                      dataKey="healthy"
+                      stackId="1"
+                      stroke="hsl(var(--status-healthy))"
+                      fill="url(#healthyGrad)"
+                      name="Healthy (%)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="moderate"
+                      stackId="1"
+                      stroke="hsl(var(--status-moderate))"
+                      fill="hsl(var(--status-moderate))"
+                      fillOpacity={0.6}
+                      name="Moderate (%)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="degraded"
+                      stackId="1"
+                      stroke="hsl(var(--status-risk))"
+                      fill="hsl(var(--status-risk))"
+                      fillOpacity={0.6}
+                      name="Degraded (%)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="space-y-4">
+                  {vegetationChange.map((yearData, idx) => (
+                    <div key={yearData.year} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-white font-semibold">{yearData.year}</span>
+                        <span className="text-gray-400 text-sm">Total: 100%</span>
+                      </div>
+                      <div className="flex h-12 rounded-lg overflow-hidden border border-[#10B981]/30">
+                        <div 
+                          className="bg-[#00E676] flex items-center justify-center text-black font-semibold text-sm transition-all hover:opacity-80"
+                          style={{ width: `${yearData.healthy}%` }}
+                          title={`Healthy: ${yearData.healthy}%`}
+                        >
+                          {yearData.healthy}%
+                        </div>
+                        <div 
+                          className="bg-[#FF8C00] flex items-center justify-center text-white font-semibold text-sm transition-all hover:opacity-80"
+                          style={{ width: `${yearData.moderate}%` }}
+                          title={`Moderate: ${yearData.moderate}%`}
+                        >
+                          {yearData.moderate}%
+                        </div>
+                        <div 
+                          className="bg-[#FF3B3B] flex items-center justify-center text-white font-semibold text-sm transition-all hover:opacity-80"
+                          style={{ width: `${yearData.degraded}%` }}
+                          title={`Degraded: ${yearData.degraded}%`}
+                        >
+                          {yearData.degraded}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="grid grid-cols-3 gap-4 mt-6">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-[#00E676] rounded"></div>
+                      <span className="text-white text-sm">Healthy</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-[#FF8C00] rounded"></div>
+                      <span className="text-white text-sm">Moderate Risk</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-[#FF3B3B] rounded"></div>
+                      <span className="text-white text-sm">Degraded</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -298,28 +461,74 @@ const DataInsights = () => {
 
         {/* Upload Data Tab */}
         <TabsContent value="upload" className="space-y-6 mt-6">
-          <Card>
+          <Card className="bg-[#0F1419] border border-[#10B981]/30 hover:border-[#00FF41] transition-all">
             <CardHeader>
-              <CardTitle>Upload Your Data</CardTitle>
+              <CardTitle className="text-white">Upload Your Data</CardTitle>
               <CardDescription>Upload CSV or Excel files for custom analysis</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="border-2 border-dashed border-border rounded-lg p-12 text-center space-y-4">
-                <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium mb-1">Drop files here or click to browse</p>
-                  <p className="text-xs text-muted-foreground">Supports CSV, XLSX (max 10MB)</p>
+              {!uploadedFile ? (
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <div className="border-2 border-dashed border-[#10B981] rounded-xl p-12 text-center space-y-4 hover:border-[#00FF41] transition-all bg-[#1A1F26]">
+                    <Upload className="h-16 w-16 mx-auto text-[#00FF41]" />
+                    <div>
+                      <p className="text-white font-semibold text-lg mb-2">Upload Your Data</p>
+                      <p className="text-gray-400 text-sm">CSV, Excel files supported (Max 10MB)</p>
+                    </div>
+                    <div className="mt-4 bg-[#00FF41] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#39FF14] transition-all inline-block">
+                      Choose File
+                    </div>
+                  </div>
+                </label>
+              ) : (
+                <div className="bg-[#1A1F26] border border-[#10B981]/30 rounded-xl p-8 text-center">
+                  {isProcessing ? (
+                    <>
+                      <div className="w-16 h-16 mx-auto mb-4 relative">
+                        <div className="absolute inset-0 border-4 border-[#00FF41] rounded-full border-t-transparent animate-spin"></div>
+                      </div>
+                      <p className="text-white font-semibold mb-2">Processing {uploadedFile.name}...</p>
+                      <p className="text-gray-400 text-sm">Analyzing data structure</p>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-16 h-16 text-[#00FF41] mx-auto mb-4" />
+                      <p className="text-white font-semibold text-lg mb-2">Upload Successful!</p>
+                      <p className="text-[#00FF41] mb-4">{uploadedData?.length || 0} rows processed</p>
+                      <div className="flex gap-3 justify-center">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            setUploadedFile(null);
+                            setUploadedData(null);
+                          }}
+                          className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black"
+                        >
+                          Upload Another
+                        </Button>
+                        <Button className="bg-[#00FF41] text-black hover:bg-[#39FF14]">
+                          Analyze Data →
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <Button onClick={handleUpload}>Select Files</Button>
-              </div>
+              )}
 
               <div className="flex justify-between items-center">
-                <Button variant="outline">
+                <Button 
+                  variant="outline"
+                  onClick={handleDownloadSample}
+                  className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black"
+                >
                   <Download className="h-4 w-4 mr-2" />
                   Download Sample Data
-                </Button>
-                <Button className="gradient-hero" onClick={handleAnalyze}>
-                  Analyze Data
                 </Button>
               </div>
 
