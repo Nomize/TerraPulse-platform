@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,10 +16,14 @@ const ImpactTracker = () => {
   const [showPointsAnim, setShowPointsAnim] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [displayPoints, setDisplayPoints] = useState(2450);
-  const [badgeModal, setBadgeModal] = useState<{ open: boolean; badge: any }>({ 
-    open: false, 
-    badge: null 
+  const [previousRank, setPreviousRank] = useState(4);
+  const [currentRank, setCurrentRank] = useState(4);
+  const [showRankChange, setShowRankChange] = useState(false);
+  const [badgeModal, setBadgeModal] = useState<{ open: boolean; badge: any }>({
+    open: false,
+    badge: null
   });
+  const [newActivityIndex, setNewActivityIndex] = useState<number | null>(null);
   const [activities, setActivities] = useState<Array<{ type: string; quantity: number; date: string }>>([
     { type: "Tree Planting", quantity: 50, date: "2 days ago" },
     { type: "Soil Testing", quantity: 5, date: "1 week ago" },
@@ -68,9 +72,24 @@ const ImpactTracker = () => {
     { rank: 1, name: "Sarah Green", points: 5240, badge: "🏆" },
     { rank: 2, name: "Michael Forest", points: 4890, badge: "🥈" },
     { rank: 3, name: "Emma Earth", points: 3670, badge: "🥉" },
-    { rank: 4, name: "You (Earth Guardian)", points: 2450, badge: "⭐", isCurrentUser: true },
+    { rank: 4, name: "You (Earth Guardian)", points: displayPoints, badge: "⭐", isCurrentUser: true },
     { rank: 5, name: "David Plant", points: 2110, badge: "" },
-  ];
+  ].sort((a, b) => b.points - a.points).map((user, index) => ({
+    ...user,
+    rank: index + 1
+  }));
+
+  useEffect(() => {
+    const userEntry = leaderboard.find(u => u.isCurrentUser);
+    if (userEntry && userEntry.rank !== currentRank) {
+      setPreviousRank(currentRank);
+      setCurrentRank(userEntry.rank);
+      if (userEntry.rank < previousRank) {
+        setShowRankChange(true);
+        setTimeout(() => setShowRankChange(false), 3000);
+      }
+    }
+  }, [displayPoints]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,10 +122,10 @@ const ImpactTracker = () => {
     }, duration / steps);
 
     setPoints(newTotal);
-    setActivities([
-      { type: activityType, quantity: parseInt(quantity), date: "Just now" },
-      ...activities,
-    ]);
+    const newActivity = { type: activityType, quantity: parseInt(quantity), date: "Just now" };
+    setActivities([newActivity, ...activities]);
+    setNewActivityIndex(0);
+    setTimeout(() => setNewActivityIndex(null), 1000);
 
     toast.success(`+${pointsEarned} Eco Points earned! 🌱`);
     
@@ -268,28 +287,41 @@ const ImpactTracker = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {leaderboard.map((user) => (
-                  <div
-                    key={user.rank}
-                    className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
-                      user.isCurrentUser
-                        ? "bg-primary/10 border border-primary/30"
-                        : "bg-muted/30 hover:bg-muted/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl w-8 text-center">{user.badge || user.rank}</span>
-                      <div>
-                        <p className={`font-medium ${user.isCurrentUser ? "text-primary" : ""}`}>
-                          {user.name}
-                        </p>
+                {leaderboard.map((user, index) => {
+                  const rankChange = user.isCurrentUser && previousRank !== currentRank ? previousRank - currentRank : 0;
+                  return (
+                    <div
+                      key={`${user.name}-${index}`}
+                      className={`flex items-center justify-between p-3 rounded-lg transition-all duration-500 ${
+                        user.isCurrentUser
+                          ? "bg-primary/10 border-2 border-primary/50 animate-leaderboard-pulse"
+                          : "bg-muted/30 hover:bg-muted/50"
+                      }`}
+                      style={{
+                        transform: user.isCurrentUser && showRankChange ? 'translateY(-5px)' : 'translateY(0)',
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl w-8 text-center">{user.badge || user.rank}</span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className={`font-medium ${user.isCurrentUser ? "text-primary" : ""}`}>
+                              {user.name}
+                            </p>
+                            {user.isCurrentUser && rankChange > 0 && showRankChange && (
+                              <span className="text-[#00FF41] font-bold text-sm animate-rank-up">
+                                ↑ +{rankChange}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                      <Badge variant={user.isCurrentUser ? "default" : "outline"} className="transition-all">
+                        {user.points.toLocaleString()} pts
+                      </Badge>
                     </div>
-                    <Badge variant={user.isCurrentUser ? "default" : "outline"}>
-                      {user.points.toLocaleString()} pts
-                    </Badge>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -307,42 +339,58 @@ const ImpactTracker = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {badges.map((badge, index) => (
-              <Card
-                key={index}
-                className={`transition-all duration-300 hover:scale-105 ${
-                  badge.earned
-                    ? "border-primary/50 bg-primary/5 shadow-[0_0_20px_rgba(0,255,65,0.3)]"
-                    : "border-border opacity-60 grayscale"
-                }`}
-              >
-                <CardContent className="p-6 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <badge.icon className={`h-10 w-10 ${
-                      badge.earned ? "text-primary" : "text-muted-foreground"
-                    }`} />
-                    {badge.earned && (
-                      <Badge variant="default" className="gradient-hero">Earned</Badge>
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">{badge.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {badge.description}
-                    </p>
-                  </div>
-                  {!badge.earned && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-medium">{badge.progress}%</span>
+            {badges.map((badge, index) => {
+              const nextBadgeProgress = !badge.earned ? badge.progress : 100;
+              return (
+                <Card
+                  key={index}
+                  className={`relative overflow-hidden transition-all duration-500 hover:scale-105 group ${
+                    badge.earned
+                      ? "border-primary/50 bg-primary/5 shadow-[0_0_20px_rgba(0,255,65,0.3)] animate-badge-earned"
+                      : "border-border hover:border-primary/30"
+                  }`}
+                  style={{
+                    filter: badge.earned ? 'grayscale(0)' : 'grayscale(0.7)',
+                    opacity: badge.earned ? 1 : 0.75,
+                  }}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br from-[#00FF41]/0 to-[#00FF41]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                  <CardContent className="p-6 space-y-3 relative">
+                    <div className="flex items-center justify-between">
+                      <div className="relative">
+                        {badge.earned && (
+                          <div className="absolute -inset-2 bg-[#00FF41]/20 rounded-full animate-ping-slow" />
+                        )}
+                        <badge.icon className={`h-10 w-10 relative transition-all duration-300 ${
+                          badge.earned ? "text-primary drop-shadow-[0_0_10px_rgba(0,255,65,0.6)] animate-badge-glow" : "text-muted-foreground"
+                        } group-hover:scale-110`} />
                       </div>
-                      <Progress value={badge.progress} className="h-1.5" />
+                      {badge.earned && (
+                        <Badge variant="default" className="gradient-hero animate-fade-in">Earned</Badge>
+                      )}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    <div>
+                      <h4 className="font-semibold">{badge.name}</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {badge.description}
+                      </p>
+                    </div>
+                    {!badge.earned && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">Progress</span>
+                          <span className="font-medium text-primary">{badge.progress}%</span>
+                        </div>
+                        <Progress value={nextBadgeProgress} className="h-1.5" />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Next Badge: {Math.round((100 - badge.progress) / 10)} more actions
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -356,13 +404,21 @@ const ImpactTracker = () => {
         <CardContent>
           <div className="space-y-3">
             {activities.map((activity, index) => (
-              <div 
-                key={index} 
-                className="flex items-center justify-between p-3 bg-muted/30 rounded-lg animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
+              <div
+                key={index}
+                className={`flex items-center justify-between p-3 rounded-lg transition-all duration-500 ${
+                  index === newActivityIndex
+                    ? "bg-primary/20 border-2 border-primary animate-activity-slide-in shadow-[0_0_20px_rgba(0,255,65,0.4)]"
+                    : "bg-muted/30 animate-fade-in"
+                }`}
+                style={{
+                  animationDelay: index === newActivityIndex ? '0s' : `${index * 0.1}s`,
+                }}
               >
                 <div className="flex items-center gap-3">
-                  <div className="gradient-hero p-2 rounded-lg">
+                  <div className={`gradient-hero p-2 rounded-lg transition-all ${
+                    index === newActivityIndex ? "animate-pulse-glow" : ""
+                  }`}>
                     <TrendingUp className="h-4 w-4 text-primary-foreground" />
                   </div>
                   <div>
@@ -372,7 +428,12 @@ const ImpactTracker = () => {
                     <p className="text-xs text-muted-foreground">{activity.date}</p>
                   </div>
                 </div>
-                <Badge variant="outline">+{activity.quantity * 10} pts</Badge>
+                <Badge
+                  variant="outline"
+                  className={index === newActivityIndex ? "bg-primary/20 border-primary text-primary" : ""}
+                >
+                  +{activity.quantity * 10} pts
+                </Badge>
               </div>
             ))}
           </div>
