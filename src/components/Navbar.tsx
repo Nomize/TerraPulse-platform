@@ -1,12 +1,22 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Leaf, Bell, User, Search } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, Leaf, Bell, User, Search, Settings, LayoutDashboard, HelpCircle, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const navItems = [
     { name: "Dashboard", path: "/dashboard" },
@@ -51,16 +61,72 @@ const Navbar = () => {
           <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
             <Search className="h-5 w-5 text-primary" />
           </Button>
-          <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative hover:bg-primary/10 hover:scale-110 transition-transform"
+            onClick={() => navigate('/notifications')}
+          >
             <Bell className="h-5 w-5 text-primary" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse shadow-glow"></span>
+            <span className="absolute top-0 right-0 min-w-[18px] h-[18px] bg-primary text-black text-xs font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,255,65,0.8)]">
+              3
+            </span>
           </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-            <div className="relative">
-              <User className="h-5 w-5 text-primary" />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success border-2 border-background rounded-full"></div>
-            </div>
-          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="hover:bg-primary/10 hover:scale-110 transition-transform"
+              >
+                <div className="relative">
+                  <User className="h-5 w-5 text-primary" />
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success border-2 border-background rounded-full"></div>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              className="w-56 bg-[#0F1419] border-primary/30 shadow-[0_0_20px_rgba(0,255,65,0.3)]"
+              align="end"
+            >
+              <DropdownMenuItem 
+                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+                onClick={() => navigate('/profile')}
+              >
+                <User className="mr-2 h-4 w-4 text-primary" />
+                <span>My Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+                onClick={() => navigate('/settings')}
+              >
+                <Settings className="mr-2 h-4 w-4 text-primary" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+                onClick={() => navigate('/dashboard')}
+              >
+                <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
+                <span>Dashboard</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+              >
+                <HelpCircle className="mr-2 h-4 w-4 text-primary" />
+                <span>Help & Support</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-primary/20" />
+              <DropdownMenuItem 
+                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer text-red-500"
+                onClick={() => signOut()}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile Menu Button */}

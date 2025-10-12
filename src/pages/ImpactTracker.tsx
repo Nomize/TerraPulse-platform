@@ -8,9 +8,18 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Trophy, TrendingUp, Award, Sprout, Droplets, TreeDeciduous, Wheat } from "lucide-react";
 import { toast } from "sonner";
+import { PointsAnimation } from "@/components/PointsAnimation";
+import { BadgeUnlockModal } from "@/components/BadgeUnlockModal";
 
 const ImpactTracker = () => {
   const [points, setPoints] = useState(2450);
+  const [showPointsAnim, setShowPointsAnim] = useState(false);
+  const [earnedPoints, setEarnedPoints] = useState(0);
+  const [displayPoints, setDisplayPoints] = useState(2450);
+  const [badgeModal, setBadgeModal] = useState<{ open: boolean; badge: any }>({ 
+    open: false, 
+    badge: null 
+  });
   const [activities, setActivities] = useState<Array<{ type: string; quantity: number; date: string }>>([
     { type: "Tree Planting", quantity: 50, date: "2 days ago" },
     { type: "Soil Testing", quantity: 5, date: "1 week ago" },
@@ -71,13 +80,49 @@ const ImpactTracker = () => {
     }
 
     const pointsEarned = parseInt(quantity) * 10;
-    setPoints(points + pointsEarned);
+    const newTotal = points + pointsEarned;
+    
+    // Show points animation
+    setEarnedPoints(pointsEarned);
+    setShowPointsAnim(true);
+    
+    // Animate counter
+    const duration = 1000;
+    const steps = 30;
+    const increment = pointsEarned / steps;
+    let currentStep = 0;
+    
+    const interval = setInterval(() => {
+      currentStep++;
+      if (currentStep <= steps) {
+        setDisplayPoints(Math.floor(points + (increment * currentStep)));
+      } else {
+        setDisplayPoints(newTotal);
+        clearInterval(interval);
+      }
+    }, duration / steps);
+
+    setPoints(newTotal);
     setActivities([
       { type: activityType, quantity: parseInt(quantity), date: "Just now" },
       ...activities,
     ]);
 
     toast.success(`+${pointsEarned} Eco Points earned! 🌱`);
+    
+    // Check for badge unlock (example: unlock Water Warrior at 2500 points)
+    if (newTotal >= 2500 && points < 2500) {
+      setTimeout(() => {
+        setBadgeModal({
+          open: true,
+          badge: {
+            icon: Droplets,
+            name: "Water Warrior",
+            description: "Saved 1000L water"
+          }
+        });
+      }, 1500);
+    }
     
     // Reset form
     setActivityType("");
@@ -87,6 +132,21 @@ const ImpactTracker = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Points Animation */}
+      <PointsAnimation 
+        value={earnedPoints}
+        show={showPointsAnim}
+        onComplete={() => setShowPointsAnim(false)}
+      />
+
+      {/* Badge Unlock Modal */}
+      {badgeModal.badge && (
+        <BadgeUnlockModal
+          open={badgeModal.open}
+          onClose={() => setBadgeModal({ open: false, badge: null })}
+          badge={badgeModal.badge}
+        />
+      )}
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl md:text-4xl font-bold flex items-center justify-center gap-2">
@@ -117,11 +177,11 @@ const ImpactTracker = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Eco Points</span>
-                <span className="font-bold text-2xl text-primary">{points}</span>
-              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Eco Points</span>
+                  <span className="font-bold text-2xl text-primary transition-all duration-300">{displayPoints}</span>
+                </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Level {level}</span>
@@ -250,10 +310,10 @@ const ImpactTracker = () => {
             {badges.map((badge, index) => (
               <Card
                 key={index}
-                className={`${
+                className={`transition-all duration-300 hover:scale-105 ${
                   badge.earned
-                    ? "border-primary/50 bg-primary/5"
-                    : "border-border opacity-60"
+                    ? "border-primary/50 bg-primary/5 shadow-[0_0_20px_rgba(0,255,65,0.3)]"
+                    : "border-border opacity-60 grayscale"
                 }`}
               >
                 <CardContent className="p-6 space-y-3">
@@ -296,7 +356,11 @@ const ImpactTracker = () => {
         <CardContent>
           <div className="space-y-3">
             {activities.map((activity, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+              <div 
+                key={index} 
+                className="flex items-center justify-between p-3 bg-muted/30 rounded-lg animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
                 <div className="flex items-center gap-3">
                   <div className="gradient-hero p-2 rounded-lg">
                     <TrendingUp className="h-4 w-4 text-primary-foreground" />

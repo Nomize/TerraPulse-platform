@@ -73,11 +73,45 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Satellite grid effect */}
+      {/* Enhanced Satellite Grid Effect */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[linear-gradient(45deg,#00FF4105_1px,transparent_1px),linear-gradient(-45deg,#00FF4105_1px,transparent_1px)] bg-[size:4rem_4rem] animate-satellite-grid" />
+        {/* Animated diagonal grid lines */}
+        <div className="absolute inset-0">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+                <path d="M 80 0 L 0 80" stroke="#00FF41" strokeWidth="0.5" opacity="0.1" />
+                <path d="M 0 0 L 80 80" stroke="#00FF41" strokeWidth="0.5" opacity="0.1" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+            <animate attributeName="x" from="0" to="80" dur="20s" repeatCount="indefinite" />
+          </svg>
+        </div>
+
+        {/* Orbital paths with moving satellites */}
+        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          {/* Orbit 1 */}
+          <ellipse cx="50%" cy="50%" rx="40%" ry="30%" fill="none" stroke="#00FF41" strokeWidth="1" opacity="0.15" />
+          <circle r="4" fill="#00FF41" opacity="0.8">
+            <animateMotion dur="15s" repeatCount="indefinite" path="M 960,540 A 768,432 0 1,1 960,539" />
+          </circle>
+          
+          {/* Orbit 2 */}
+          <ellipse cx="50%" cy="50%" rx="30%" ry="45%" fill="none" stroke="#00FF41" strokeWidth="1" opacity="0.12" />
+          <circle r="3" fill="#00FF41" opacity="0.6">
+            <animateMotion dur="20s" repeatCount="indefinite" path="M 960,540 A 576,648 0 1,1 960,539" />
+          </circle>
+
+          {/* Orbit 3 */}
+          <ellipse cx="50%" cy="50%" rx="25%" ry="20%" fill="none" stroke="#00FF41" strokeWidth="1" opacity="0.1" />
+          <circle r="2" fill="#00FF41" opacity="0.5">
+            <animateMotion dur="12s" repeatCount="indefinite" path="M 960,540 A 480,288 0 1,1 960,539" />
+          </circle>
+        </svg>
+
         {/* Glowing intersection points */}
-        {[...Array(20)].map((_, i) => (
+        {[...Array(25)].map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-[#00FF41] rounded-full animate-pulse"
@@ -91,8 +125,8 @@ export default function Signup() {
         ))}
       </div>
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/50 to-black" />
+      {/* Radial gradient overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,255,65,0.05)_50%,#000_100%)]" />
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-6 py-12">
@@ -299,20 +333,20 @@ export default function Signup() {
             </div>
             
             <div className="grid grid-cols-2 gap-6 w-full">
-              <div className="bg-[#1A1F26]/50 border border-[#10B981]/20 rounded-xl p-6 hover:border-[#00FF41] transition-all">
-                <p className="text-4xl font-bold text-[#00FF41] mb-2">1M+</p>
+              <div className="bg-[#1A1F26]/50 border border-[#10B981]/20 rounded-xl p-6 hover:border-[#00FF41] transition-all hover:shadow-[0_0_20px_rgba(0,255,65,0.3)]">
+                <p className="text-4xl font-bold text-[#00FF41] mb-2 drop-shadow-[0_0_10px_rgba(0,255,65,0.5)]">1M+</p>
                 <p className="text-gray-400 text-sm">Hectares Monitored</p>
               </div>
-              <div className="bg-[#1A1F26]/50 border border-[#10B981]/20 rounded-xl p-6 hover:border-[#00FF41] transition-all">
-                <p className="text-4xl font-bold text-[#00FF41] mb-2">156K</p>
+              <div className="bg-[#1A1F26]/50 border border-[#10B981]/20 rounded-xl p-6 hover:border-[#00FF41] transition-all hover:shadow-[0_0_20px_rgba(0,255,65,0.3)]">
+                <p className="text-4xl font-bold text-[#00FF41] mb-2 drop-shadow-[0_0_10px_rgba(0,255,65,0.5)]">156K</p>
                 <p className="text-gray-400 text-sm">Tons CO₂ Sequestered</p>
               </div>
             </div>
 
             <div className="w-32 h-32 relative">
-              <div className="absolute inset-0 bg-[#00FF41]/10 rounded-full animate-pulse"></div>
-              <div className="absolute inset-4 bg-[#00FF41]/20 rounded-full animate-ping"></div>
-              <Leaf className="absolute inset-0 m-auto w-16 h-16 text-[#00FF41]" />
+              <div className="absolute inset-0 bg-[#00FF41]/10 rounded-full animate-pulse shadow-[0_0_40px_rgba(0,255,65,0.4)]"></div>
+              <div className="absolute inset-4 bg-[#00FF41]/20 rounded-full animate-ping shadow-[0_0_20px_rgba(0,255,65,0.6)]"></div>
+              <Leaf className="absolute inset-0 m-auto w-16 h-16 text-[#00FF41] drop-shadow-[0_0_15px_rgba(0,255,65,0.8)]" />
             </div>
           </div>
         </div>

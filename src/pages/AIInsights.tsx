@@ -142,6 +142,10 @@ const AIInsights = () => {
           <Card className="md:col-span-3 lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg">Chat with AI</CardTitle>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="w-2 h-2 bg-[#00FF41] rounded-full animate-pulse shadow-[0_0_10px_rgba(0,255,65,0.8)]" />
+                <span className="text-[#00FF41] font-semibold">Online</span>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Example Queries */}
@@ -155,7 +159,7 @@ const AIInsights = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handleExampleClick(query)}
-                        className="text-xs"
+                        className="text-xs border-[#00FF41]/50 text-[#00FF41] hover:bg-[#00FF41]/10 hover:border-[#00FF41]"
                       >
                         {query}
                       </Button>
@@ -176,8 +180,8 @@ const AIInsights = () => {
                     <div
                       className={`max-w-[80%] rounded-lg p-4 ${
                         message.role === "user"
-                          ? "gradient-hero text-primary-foreground"
-                          : "bg-muted"
+                          ? "bg-primary/20 border-2 border-primary text-foreground"
+                          : "bg-[#1A1F26] border-l-4 border-[#00FF41]"
                       }`}
                     >
                       <p className="text-sm whitespace-pre-line">{message.content}</p>
@@ -186,19 +190,19 @@ const AIInsights = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 px-2"
+                            className="h-8 px-2 hover:bg-[#00FF41]/10"
                             onClick={() => handleCopy(message.content)}
                           >
-                            <Copy className="h-3 w-3" />
+                            <Copy className="h-3 w-3 text-[#00FF41]" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-8 px-2">
-                            <ThumbsUp className="h-3 w-3" />
+                          <Button variant="ghost" size="sm" className="h-8 px-2 hover:bg-[#00FF41]/10">
+                            <ThumbsUp className="h-3 w-3 text-[#00FF41]" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-8 px-2">
-                            <ThumbsDown className="h-3 w-3" />
+                          <Button variant="ghost" size="sm" className="h-8 px-2 hover:bg-[#00FF41]/10">
+                            <ThumbsDown className="h-3 w-3 text-[#00FF41]" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-8 px-2">
-                            <RefreshCw className="h-3 w-3" />
+                          <Button variant="ghost" size="sm" className="h-8 px-2 hover:bg-[#00FF41]/10">
+                            <RefreshCw className="h-3 w-3 text-[#00FF41]" />
                           </Button>
                         </div>
                       )}
@@ -208,11 +212,11 @@ const AIInsights = () => {
 
                 {isTyping && (
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg p-4">
+                    <div className="bg-[#1A1F26] border-l-4 border-[#00FF41] rounded-lg p-4">
                       <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+                        <div className="w-2 h-2 bg-[#00FF41] rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-[#00FF41] rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                        <div className="w-2 h-2 bg-[#00FF41] rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
                       </div>
                     </div>
                   </div>
@@ -226,9 +230,12 @@ const AIInsights = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Ask about soil health, vegetation trends..."
-                  className="flex-1"
+                  className="flex-1 border-[#00FF41]/50 focus:border-[#00FF41] focus:shadow-[0_0_20px_rgba(0,255,65,0.5)]"
                 />
-                <Button onClick={handleSend}>
+                <Button 
+                  onClick={handleSend}
+                  className="bg-[#00FF41] text-black hover:bg-[#39FF14] hover:shadow-[0_0_30px_rgba(0,255,65,0.7)]"
+                >
                   <Send className="h-4 w-4" />
                 </Button>
               </div>

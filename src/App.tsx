@@ -12,6 +12,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Onboarding from "./pages/Onboarding";
+import Notifications from "./pages/Notifications";
 import Dashboard from "./pages/Dashboard";
 import AIInsights from "./pages/AIInsights";
 import ImpactTracker from "./pages/ImpactTracker";
@@ -80,6 +81,15 @@ const App = () => (
                 <div className="min-h-screen flex flex-col">
                   <Navbar />
                   <main className="flex-1"><DataInsights /></main>
+                  <Footer />
+                </div>
+              </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <div className="min-h-screen flex flex-col">
+                  <Navbar />
+                  <main className="flex-1"><Notifications /></main>
                   <Footer />
                 </div>
               </ProtectedRoute>

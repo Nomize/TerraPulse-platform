@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { RefreshCcw, Download, TrendingUp, TrendingDown, Droplets } from "lucide-react";
-import MapComponent from "@/components/MapComponent";
+import EnhancedMapComponent from "@/components/EnhancedMapComponent";
+import DegradationDetection from "@/components/DegradationDetection";
 
 const Dashboard = () => {
   const [soilHealth, setSoilHealth] = useState(73);
@@ -225,9 +226,14 @@ const Dashboard = () => {
             <CardDescription>Interactive risk zone monitoring</CardDescription>
           </CardHeader>
           <CardContent>
-            <MapComponent />
+            <EnhancedMapComponent />
           </CardContent>
         </Card>
+      </div>
+
+      {/* Degradation Detection Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        <DegradationDetection />
       </div>
 
       {/* Filters Bar */}
