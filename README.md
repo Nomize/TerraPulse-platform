@@ -117,6 +117,12 @@ terrapulse/
 ## 🎨 Design System
 
 **Theme:** Black & Green (cyber/tech aesthetic)
+Color Philosophy
+Black & Green Theme representing:
+
+Black: Earth, satellite view of night, seriousness of climate crisis
+Green: Life, growth, vegetation, hope for restoration
+Neon accents: Technology, AI, cutting-edge solutions
 
 - **Black (#000000)** - Main background
 - **Charcoal (#0F1419)** - Cards
@@ -165,33 +171,62 @@ Value = Carbon tons × $15/ton market price
 
 ---
 
-## 📈 Roadmap
+## 🗺️ Roadmap
+✅ Completed (v1.0)
 
-**v1.0 (Current)** ✅
-- Authentication, maps, AI chat, gamification, analytics
+1.  Landing page with animated hero
+2. User authentication (email + Google OAuth)
+3. Interactive degradation map with polygon zones
+4. AI chat assistant
+5. Degradation detection panel
+6. Gamification system (points, badges, leaderboard)
+7. Impact simulation engine
+8.  Data insights & visualization
+9.  Profile management
+10.  Responsive design (mobile/tablet/desktop)
 
-**v1.1 (Next)** 🚧
-- Fix badge logic
-- Add notifications
-- More data layers
+## 🚧 In Progress (v1.1)
 
-**v2.0 (Q1 2025)** 🔮
-- Mobile app
-- Multi-language support
-- Carbon credit marketplace
-- IoT sensor integration
+1.  Fix badge assignment logic (currently shows wrong badge)
+2.  Add more satellite data layers (soil moisture, temperature)
+3. Implement notification system
+4. Create onboarding tutorial
+5. Add sample datasets for demo users
 
----
+## 🔮 Planned (v2.0 - Q1 2025)
+
+1.  Mobile app (React Native)
+2.  Offline mode for field data collection
+3.  Multi-language support (French, Portuguese, Swahili)
+4. Real-time collaboration (teams can work on same project)
+5. Carbon credit marketplace integration
+6. Blockchain verification for restoration claims
+7. IoT sensor integration (soil moisture, weather stations)
+8.  WhatsApp/SMS alerts for critical degradation
+9.  API for third-party integrations
+10. Machine learning model training on user data
+
+## 🌟 Future Vision (v3.0 - 2026)
+
+ 1. Drone imagery integration
+ 2.  Predictive AI (forecast degradation before it happens)
+ 3.  Global land health index
+ 4. Regenerative agriculture certification
+ 5.Community land trusts
+ 6.Impact investing platform
+ 7. Educational courses & certifications
+
 
 ## 🤝 Contributing
+   We welcome contributions! Here's how you can help:
+   Ways to Contribute
 
-Contributions welcome! 
-
-1. Fork the repo
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+1. Report bugs: Open an issue with detailed steps to reproduce
+2. Suggest features: Share ideas in GitHub Discussions
+3. Improve docs: Fix typos, add examples, clarify instructions
+4. Submit code: Fork, make changes, submit pull request
+5. Test: Help us test on different devices/browsers
+6. Spread the word: Share TerraPulse with your network
 
 ---
 
@@ -214,7 +249,7 @@ MIT License - see [LICENSE](LICENSE) file
 ## 📞 Contact
 
 **Email:** hello@terrapulse.io  
-**GitHub:** [github.com/username/terrapulse](https://github.com/Nomize/terrapulse)  
+**GitHub:** [github.com/username/terrapulse](https://github.com/Nomize/TerraPulse-platform)  
 **Demo:** [terrapulse.netlify.app](https://terrapulsee.netlify.app)
 
 ---
