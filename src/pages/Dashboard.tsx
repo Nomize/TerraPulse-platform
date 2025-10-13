@@ -1,16 +1,77 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { RefreshCcw, Download, TrendingUp, TrendingDown, Droplets } from "lucide-react";
+import { 
+  TrendingUp, TrendingDown, Download, Droplets, FileText 
+} from "lucide-react";
+import { toast } from "sonner";
+import { exportToCSV, exportToPDF } from "@/lib/export-utils";
 import EnhancedMapComponent from "@/components/EnhancedMapComponent";
 import DegradationDetection from "@/components/DegradationDetection";
+import { GuestBanner } from "@/components/GuestBanner";
 
 const Dashboard = () => {
   const [soilHealth, setSoilHealth] = useState(73);
   const [lastUpdate, setLastUpdate] = useState(0);
+
+  const handleExportCSV = () => {
+    const data = [
+      { Date: '2024-01-15', Zone: 'A3', NDVI: 0.72, SoilHealth: 85, ErosionRate: 2.3 },
+      { Date: '2024-01-16', Zone: 'B7', NDVI: 0.65, SoilHealth: 78, ErosionRate: 3.1 },
+      { Date: '2024-01-17', Zone: 'C2', NDVI: 0.81, SoilHealth: 92, ErosionRate: 1.2 },
+    ];
+    exportToCSV(data, 'terrapulse_data');
+    toast.success('Data exported to CSV');
+  };
+
+  const handleDownloadReport = () => {
+    const content = `
+      <h2>Land Health Summary</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Current Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Average NDVI</td>
+            <td>0.73</td>
+            <td>Good</td>
+          </tr>
+          <tr>
+            <td>Soil Health Score</td>
+            <td>85/100</td>
+            <td>Healthy</td>
+          </tr>
+          <tr>
+            <td>High Risk Zones</td>
+            <td>1</td>
+            <td>Monitor</td>
+          </tr>
+          <tr>
+            <td>Total Area</td>
+            <td>156 ha</td>
+            <td>-</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h2>Zone Analysis</h2>
+      <ul>
+        <li><strong>Zone A3:</strong> High erosion risk detected. Implement contour plowing.</li>
+        <li><strong>Zone B7:</strong> Moderate vegetation loss. Increase irrigation.</li>
+        <li><strong>Zone C2:</strong> Excellent recovery. Continue current practices.</li>
+      </ul>
+    `;
+    exportToPDF('TerraPulse Land Health Report', content);
+    toast.success('Opening print dialog for PDF');
+  };
 
   // Mock NDVI data
   const ndviData = [
@@ -53,6 +114,8 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
+      <GuestBanner />
+      
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -63,13 +126,13 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" size="sm">
+          <Button onClick={handleExportCSV} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Export Report
+            Export CSV
           </Button>
-          <Button size="sm">
-            <RefreshCcw className="h-4 w-4 mr-2" />
-            Refresh
+          <Button onClick={handleDownloadReport} size="sm">
+            <FileText className="h-4 w-4 mr-2" />
+            Download Report
           </Button>
         </div>
       </div>
@@ -212,7 +275,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <Button className="w-full">
+            <Button onClick={handleDownloadReport} className="w-full">
               <Download className="h-4 w-4 mr-2" />
               Download Data
             </Button>

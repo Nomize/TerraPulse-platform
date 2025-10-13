@@ -1,49 +1,103 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { User, Mail, MapPin, Edit3, Save, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TreeDeciduous, Droplets, Sprout, Wheat, MapPin, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
 
-export default function Profile() {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+const Profile = () => {
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState({
-    full_name: '',
-    user_type: '',
-    location: '',
-    farm_size: '',
-    bio: ''
+    full_name: "",
+    user_type: "",
+    location: "",
+    farm_size: "",
+    bio: "",
   });
+  const [activities, setActivities] = useState<any[]>([]);
+  const [activityFilter, setActivityFilter] = useState("all");
+  const { user } = useAuth();
 
   useEffect(() => {
     if (user) {
       loadProfile();
+      loadActivities();
     }
   }, [user]);
 
   const loadProfile = async () => {
     if (!user) return;
-    
+
+    setLoading(true);
     const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
       .single();
 
+    setLoading(false);
+
     if (error) {
-      console.error('Error loading profile:', error);
+      console.error("Error loading profile:", error);
     } else if (data) {
       setProfile({
-        full_name: data.full_name || '',
-        user_type: data.user_type || '',
-        location: data.location || '',
-        farm_size: data.farm_size?.toString() || '',
-        bio: data.bio || ''
+        full_name: data.full_name || "",
+        user_type: data.user_type || "",
+        location: data.location || "",
+        farm_size: data.farm_size?.toString() || "",
+        bio: data.bio || "",
       });
+    }
+  };
+
+  const loadActivities = async () => {
+    if (!user) return;
+    
+    try {
+      let query = supabase
+        .from('activities')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (activityFilter === 'week') {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        query = query.gte('created_at', weekAgo.toISOString());
+      } else if (activityFilter === 'month') {
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        query = query.gte('created_at', monthAgo.toISOString());
+      }
+
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      setActivities(data || []);
+    } catch (error) {
+      console.error('Error loading activities:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadActivities();
+  }, [activityFilter, user]);
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case "Tree Planting": return TreeDeciduous;
+      case "Soil Testing": return Sprout;
+      case "Water Conservation": return Droplets;
+      case "Composting": return Wheat;
+      default: return TrendingUp;
     }
   };
 
@@ -52,114 +106,201 @@ export default function Profile() {
 
     setLoading(true);
     const { error } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update({
         full_name: profile.full_name,
         user_type: profile.user_type,
         location: profile.location,
         farm_size: profile.farm_size ? parseFloat(profile.farm_size) : null,
-        bio: profile.bio
+        bio: profile.bio,
       })
-      .eq('id', user.id);
+      .eq("id", user.id);
 
     setLoading(false);
 
     if (error) {
-      toast.error('Failed to update profile');
+      toast.error("Failed to update profile");
+      console.error("Error updating profile:", error);
     } else {
-      toast.success('Profile updated successfully!');
+      toast.success("Profile updated successfully!");
       setEditing(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black py-12 px-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-[#0F1419] border border-[#10B981]/30 rounded-2xl p-8 shadow-[0_0_40px_rgba(0,255,65,0.1)]">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
-            {!editing ? (
-              <Button
-                onClick={() => setEditing(true)}
-                variant="outline"
-                className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black"
-              >
-                <Edit3 className="w-4 h-4 mr-2" />
-                Edit Profile
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl md:text-4xl font-bold">Profile Settings</h1>
+        {!editing ? (
+          <Button onClick={() => setEditing(true)}>Edit Profile</Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setEditing(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>Save Changes</Button>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Left Column - Avatar & Basic Info */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Avatar</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-4">
+              <Avatar className="h-32 w-32">
+                <AvatarFallback className="text-4xl gradient-hero text-primary-foreground">
+                  {profile.full_name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+              </div>
+              <Button variant="outline" className="w-full">
+                Change Avatar
               </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className="bg-[#00FF41] text-black hover:bg-[#39FF14]"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save
-                </Button>
-                <Button
-                  onClick={() => {
-                    setEditing(false);
-                    loadProfile();
-                  }}
-                  variant="outline"
-                  className="border-[#10B981]/50 text-gray-400"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel
-                </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Stats</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Activities Logged</span>
+                <span className="font-semibold">{activities.length}</span>
               </div>
-            )}
-          </div>
-
-          {/* Avatar Section */}
-          <div className="flex items-center gap-6 mb-8 pb-8 border-b border-[#10B981]/20">
-            <div className="w-24 h-24 bg-gradient-to-br from-[#00FF41] to-[#10B981] rounded-full flex items-center justify-center text-4xl font-bold text-black">
-              {profile.full_name?.charAt(0) || 'U'}
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-1">{profile.full_name || 'User'}</h2>
-              <p className="text-gray-400">{user?.email}</p>
-              {profile.user_type && (
-                <span className="inline-block mt-2 px-3 py-1 bg-[#00FF41]/10 border border-[#00FF41] rounded-full text-[#00FF41] text-sm font-semibold">
-                  {profile.user_type}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Profile Form */}
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">Full Name</label>
-                <Input
-                  value={profile.full_name}
-                  onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                  disabled={!editing}
-                  className="bg-[#1A1F26] border-[#10B981]/50 text-white disabled:opacity-50"
-                />
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Eco Points</span>
+                <span className="font-semibold">{activities.reduce((sum, a) => sum + (a.points_earned || 0), 0)}</span>
               </div>
-
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">Email</label>
-                <Input
-                  value={user?.email || ''}
-                  disabled
-                  className="bg-[#1A1F26] border-[#10B981]/50 text-white opacity-50"
-                />
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Badges Earned</span>
+                <span className="font-semibold">3/10</span>
               </div>
+            </CardContent>
+          </Card>
 
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">User Type</label>
+          {/* Activity History Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Activity History</CardTitle>
                 <select
-                  value={profile.user_type}
-                  onChange={(e) => setProfile({ ...profile, user_type: e.target.value })}
-                  disabled={!editing}
-                  className="w-full bg-[#1A1F26] border border-[#10B981]/50 text-white rounded-md px-3 py-2 disabled:opacity-50"
+                  value={activityFilter}
+                  onChange={(e) => setActivityFilter(e.target.value)}
+                  className="px-3 py-1 text-sm bg-background border border-border rounded-md"
                 >
-                  <option value="">Select type</option>
+                  <option value="all">All Time</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                </select>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {activities.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No activities logged yet</p>
+              ) : (
+                activities.map((activity) => {
+                  const Icon = getActivityIcon(activity.activity_type);
+                  return (
+                    <Card 
+                      key={activity.id}
+                      className="transition-all hover:shadow-lg hover:scale-[1.02] hover:border-primary/50"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-3">
+                            <div className="gradient-hero p-2 rounded-lg">
+                              <Icon className="h-5 w-5 text-primary-foreground" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold">{activity.activity_type}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {activity.details || `Quantity: ${activity.quantity}`}
+                              </p>
+                              {activity.location && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <MapPin className="h-3 w-3 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">{activity.location}</span>
+                                </div>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {new Date(activity.created_at).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className="bg-primary/20 text-primary border-primary">
+                            +{activity.points_earned} pts
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column - Profile Form */}
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Full Name */}
+              <div>
+                <Label htmlFor="full_name">Full Name</Label>
+                <Input
+                  id="full_name"
+                  value={profile.full_name}
+                  onChange={(e) =>
+                    setProfile({ ...profile, full_name: e.target.value })
+                  }
+                  disabled={!editing}
+                />
+              </div>
+
+              {/* User Type */}
+              <div>
+                <Label htmlFor="user_type">User Type</Label>
+                <select
+                  id="user_type"
+                  value={profile.user_type}
+                  onChange={(e) =>
+                    setProfile({ ...profile, user_type: e.target.value })
+                  }
+                  disabled={!editing}
+                  className="w-full px-3 py-2 rounded-md border border-input bg-background"
+                >
+                  <option value="">Select type...</option>
                   <option value="farmer">Farmer</option>
                   <option value="ngo">NGO</option>
                   <option value="researcher">Researcher</option>
@@ -168,67 +309,55 @@ export default function Profile() {
                 </select>
               </div>
 
+              {/* Location */}
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Location</label>
+                <Label htmlFor="location">Location</Label>
                 <Input
+                  id="location"
                   value={profile.location}
-                  onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+                  onChange={(e) =>
+                    setProfile({ ...profile, location: e.target.value })
+                  }
                   disabled={!editing}
-                  placeholder="Nigeria"
-                  className="bg-[#1A1F26] border-[#10B981]/50 text-white disabled:opacity-50"
+                  placeholder="e.g., Lagos, Nigeria"
                 />
               </div>
 
+              {/* Farm Size */}
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Farm/Project Size (hectares)</label>
+                <Label htmlFor="farm_size">Farm Size (hectares)</Label>
                 <Input
+                  id="farm_size"
                   type="number"
                   value={profile.farm_size}
-                  onChange={(e) => setProfile({ ...profile, farm_size: e.target.value })}
+                  onChange={(e) =>
+                    setProfile({ ...profile, farm_size: e.target.value })
+                  }
                   disabled={!editing}
-                  placeholder="42.5"
-                  className="bg-[#1A1F26] border-[#10B981]/50 text-white disabled:opacity-50"
+                  placeholder="e.g., 42.5"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">Bio</label>
-              <Textarea
-                value={profile.bio}
-                onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                disabled={!editing}
-                placeholder="Tell us about yourself and your land restoration goals..."
-                rows={4}
-                className="bg-[#1A1F26] border-[#10B981]/50 text-white disabled:opacity-50"
-              />
-            </div>
-          </div>
-
-          {/* Account Stats */}
-          <div className="mt-8 pt-8 border-t border-[#10B981]/20">
-            <h3 className="text-xl font-bold text-white mb-4">Account Stats</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-[#1A1F26] border border-[#10B981]/20 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-[#00FF41] mb-1">0</p>
-                <p className="text-xs text-gray-400">Regions Saved</p>
+              {/* Bio */}
+              <div>
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={profile.bio}
+                  onChange={(e) =>
+                    setProfile({ ...profile, bio: e.target.value })
+                  }
+                  disabled={!editing}
+                  rows={4}
+                  placeholder="Tell us about yourself and your land regeneration goals..."
+                />
               </div>
-              <div className="bg-[#1A1F26] border border-[#10B981]/20 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-[#00FF41] mb-1">0</p>
-                <p className="text-xs text-gray-400">Data Uploads</p>
-              </div>
-              <div className="bg-[#1A1F26] border border-[#10B981]/20 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-[#00FF41] mb-1">0</p>
-                <p className="text-xs text-gray-400">Eco-Points</p>
-              </div>
-              <div className="bg-[#1A1F26] border border-[#10B981]/20 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-[#00FF41] mb-1">0</p>
-                <p className="text-xs text-gray-400">Day Streak</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Profile;

@@ -153,16 +153,19 @@ export default function Login() {
               </div>
 
               {/* Guest Button */}
-              <Link to="/dashboard">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full border-2 border-[#10B981]/50 text-gray-400 hover:border-[#00FF41] hover:text-[#00FF41] transition-all"
-                  size="lg"
-                >
-                  Continue as Guest
-                </Button>
-              </Link>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  localStorage.setItem('terrapulse_guest_mode', 'true');
+                  toast.info('Viewing as Guest - Sign up to save progress');
+                  navigate('/dashboard');
+                }}
+                className="w-full border-2 border-[#10B981]/50 text-gray-400 hover:border-[#00FF41] hover:text-[#00FF41] transition-all"
+                size="lg"
+              >
+                Continue as Guest
+              </Button>
 
               {/* Sign Up Link */}
               <p className="text-center text-sm text-gray-400">

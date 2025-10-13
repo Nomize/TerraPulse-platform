@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +14,12 @@ import { PointsAnimation } from "@/components/PointsAnimation";
 import { BadgeUnlockModal } from "@/components/BadgeUnlockModal";
 
 const ImpactTracker = () => {
+  const { user } = useAuth();
   const [points, setPoints] = useState(2450);
   const [showPointsAnim, setShowPointsAnim] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [displayPoints, setDisplayPoints] = useState(2450);
+  const [previousRank, setPreviousRank] = useState(4);
   const [badgeModal, setBadgeModal] = useState<{ open: boolean; badge: any }>({ 
     open: false, 
     badge: null 
@@ -72,7 +76,7 @@ const ImpactTracker = () => {
     { rank: 5, name: "David Plant", points: 2110, badge: "" },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activityType || !quantity) {
       toast.error("Please fill in all required fields");
@@ -81,6 +85,22 @@ const ImpactTracker = () => {
 
     const pointsEarned = parseInt(quantity) * 10;
     const newTotal = points + pointsEarned;
+    
+    // Save to database if user is logged in
+    if (user) {
+      try {
+        await supabase.from('activities').insert({
+          user_id: user.id,
+          activity_type: activityType,
+          quantity: parseInt(quantity),
+          location: location || null,
+          points_earned: pointsEarned,
+          details: `Logged ${quantity}x ${activityType}`
+        });
+      } catch (error) {
+        console.error('Error saving activity:', error);
+      }
+    }
     
     // Show points animation
     setEarnedPoints(pointsEarned);
@@ -102,7 +122,7 @@ const ImpactTracker = () => {
       }
     }, duration / steps);
 
-    setPoints(newTotal);
+    setPoints((prev) => prev + pointsEarned);
     setActivities([
       { type: activityType, quantity: parseInt(quantity), date: "Just now" },
       ...activities,
@@ -110,16 +130,41 @@ const ImpactTracker = () => {
 
     toast.success(`+${pointsEarned} Eco Points earned! 🌱`);
     
-    // Check for badge unlock (example: unlock Water Warrior at 2500 points)
-    if (newTotal >= 2500 && points < 2500) {
+    // Badge awarding logic based on activity type
+    const qty = parseInt(quantity);
+    let badgeToUnlock = null;
+    
+    if (activityType === "Tree Planting" && qty >= 50) {
+      badgeToUnlock = {
+        icon: TreeDeciduous,
+        name: "Forest Builder",
+        description: "Planted 50+ trees"
+      };
+    } else if (activityType === "Soil Testing" && qty >= 10) {
+      badgeToUnlock = {
+        icon: Sprout,
+        name: "Soil Guardian",
+        description: "Completed 10+ soil tests"
+      };
+    } else if (activityType === "Water Conservation" && qty >= 1000) {
+      badgeToUnlock = {
+        icon: Droplets,
+        name: "Water Warrior",
+        description: "Saved 1000L+ water"
+      };
+    } else if (activityType === "Composting" && qty >= 20) {
+      badgeToUnlock = {
+        icon: Wheat,
+        name: "Green Recycler",
+        description: "Composted 20+ times"
+      };
+    }
+    
+    if (badgeToUnlock) {
       setTimeout(() => {
         setBadgeModal({
           open: true,
-          badge: {
-            icon: Droplets,
-            name: "Water Warrior",
-            description: "Saved 1000L water"
-          }
+          badge: badgeToUnlock
         });
       }, 1500);
     }
@@ -177,10 +222,12 @@ const ImpactTracker = () => {
               </div>
             </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Eco Points</span>
-                  <span className="font-bold text-2xl text-primary transition-all duration-300">{displayPoints}</span>
+                  <span className="font-bold text-2xl text-primary transition-all duration-300 drop-shadow-[0_0_10px_rgba(0,255,65,0.5)]">
+                    {displayPoints}
+                  </span>
                 </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
@@ -268,28 +315,43 @@ const ImpactTracker = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {leaderboard.map((user) => (
-                  <div
-                    key={user.rank}
-                    className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
-                      user.isCurrentUser
-                        ? "bg-primary/10 border border-primary/30"
-                        : "bg-muted/30 hover:bg-muted/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl w-8 text-center">{user.badge || user.rank}</span>
-                      <div>
-                        <p className={`font-medium ${user.isCurrentUser ? "text-primary" : ""}`}>
-                          {user.name}
-                        </p>
+                {leaderboard.map((user, index) => {
+                  const isCurrentUser = user.isCurrentUser;
+                  const rankChange = isCurrentUser && previousRank > user.rank ? previousRank - user.rank : 0;
+                  
+                  return (
+                    <div
+                      key={user.rank}
+                      className={`flex items-center justify-between p-3 rounded-lg transition-all duration-500 ${
+                        isCurrentUser
+                          ? "bg-primary/10 border-2 border-primary/50 shadow-[0_0_20px_rgba(0,255,65,0.3)] scale-105"
+                          : "bg-muted/30 hover:bg-muted/50"
+                      }`}
+                      style={{
+                        transform: isCurrentUser && rankChange > 0 ? 'translateY(-10px)' : 'translateY(0)',
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl w-8 text-center">{user.badge || user.rank}</span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className={`font-medium ${isCurrentUser ? "text-primary" : ""}`}>
+                              {user.name}
+                            </p>
+                            {isCurrentUser && rankChange > 0 && (
+                              <Badge className="bg-primary text-black animate-pulse">
+                                ↑ +{rankChange}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                      <Badge variant={isCurrentUser ? "default" : "outline"}>
+                        {user.points.toLocaleString()} pts
+                      </Badge>
                     </div>
-                    <Badge variant={user.isCurrentUser ? "default" : "outline"}>
-                      {user.points.toLocaleString()} pts
-                    </Badge>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
