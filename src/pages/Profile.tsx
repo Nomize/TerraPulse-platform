@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TreeDeciduous, Droplets, Sprout, Wheat, MapPin, TrendingUp } from "lucide-react";
+import { TreeDeciduous, Droplets, Sprout, Wheat, MapPin, TrendingUp, Activity, Calendar, Edit2, Save } from "lucide-react";
 import { toast } from "sonner";
 
 const Profile = () => {
@@ -20,6 +20,7 @@ const Profile = () => {
     location: "",
     farm_size: "",
     bio: "",
+    avatar_url: ""
   });
   const [activities, setActivities] = useState<any[]>([]);
   const [activityFilter, setActivityFilter] = useState("all");
@@ -53,6 +54,7 @@ const Profile = () => {
         location: data.location || "",
         farm_size: data.farm_size?.toString() || "",
         bio: data.bio || "",
+        avatar_url: data.avatar_url || ""
       });
     }
   };
@@ -143,13 +145,19 @@ const Profile = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl font-bold">Profile Settings</h1>
         {!editing ? (
-          <Button onClick={() => setEditing(true)}>Edit Profile</Button>
+          <Button onClick={() => setEditing(true)}>
+            <Edit2 className="h-4 w-4 mr-2" />
+            Edit Profile
+          </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setEditing(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave}>Save Changes</Button>
+            <Button onClick={handleSave}>
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </Button>
           </div>
         )}
       </div>
@@ -168,7 +176,7 @@ const Profile = () => {
                     .split(" ")
                     .map((n) => n[0])
                     .join("")
-                    .toUpperCase()}
+                    .toUpperCase() || user?.email?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="text-center">
@@ -182,7 +190,10 @@ const Profile = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Account Stats</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Account Stats
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex justify-between">
@@ -204,7 +215,10 @@ const Profile = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Activity History</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" />
+                  Activity History
+                </CardTitle>
                 <select
                   value={activityFilter}
                   onChange={(e) => setActivityFilter(e.target.value)}
@@ -216,7 +230,7 @@ const Profile = () => {
                 </select>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 max-h-[500px] overflow-y-auto">
               {activities.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">No activities logged yet</p>
               ) : (
@@ -229,33 +243,36 @@ const Profile = () => {
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            <div className="gradient-hero p-2 rounded-lg">
+                          <div className="flex items-start gap-3 flex-1">
+                            <div className="gradient-hero p-2 rounded-lg shrink-0">
                               <Icon className="h-5 w-5 text-primary-foreground" />
                             </div>
-                            <div>
+                            <div className="min-w-0 flex-1">
                               <h4 className="font-semibold">{activity.activity_type}</h4>
                               <p className="text-sm text-muted-foreground">
                                 {activity.details || `Quantity: ${activity.quantity}`}
                               </p>
-                              {activity.location && (
-                                <div className="flex items-center gap-1 mt-1">
-                                  <MapPin className="h-3 w-3 text-muted-foreground" />
-                                  <span className="text-xs text-muted-foreground">{activity.location}</span>
+                              <div className="flex flex-wrap gap-3 mt-2">
+                                {activity.location && (
+                                  <div className="flex items-center gap-1">
+                                    <MapPin className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-xs text-muted-foreground">{activity.location}</span>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(activity.created_at).toLocaleDateString('en-US', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      year: 'numeric'
+                                    })}
+                                  </span>
                                 </div>
-                              )}
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {new Date(activity.created_at).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </p>
+                              </div>
                             </div>
                           </div>
-                          <Badge className="bg-primary/20 text-primary border-primary">
+                          <Badge className="bg-primary/20 text-primary border-primary shrink-0 ml-2">
                             +{activity.points_earned} pts
                           </Badge>
                         </div>
@@ -298,7 +315,7 @@ const Profile = () => {
                     setProfile({ ...profile, user_type: e.target.value })
                   }
                   disabled={!editing}
-                  className="w-full px-3 py-2 rounded-md border border-input bg-background"
+                  className="w-full px-3 py-2 rounded-md border border-input bg-background disabled:opacity-50"
                 >
                   <option value="">Select type...</option>
                   <option value="farmer">Farmer</option>

@@ -68,13 +68,27 @@ const ImpactTracker = () => {
     },
   ];
 
-  const leaderboard = [
+  const [leaderboard, setLeaderboard] = useState([
     { rank: 1, name: "Sarah Green", points: 5240, badge: "🏆" },
     { rank: 2, name: "Michael Forest", points: 4890, badge: "🥈" },
     { rank: 3, name: "Emma Earth", points: 3670, badge: "🥉" },
-    { rank: 4, name: "You (Earth Guardian)", points: 2450, badge: "⭐", isCurrentUser: true },
+    { rank: 4, name: "You (Earth Guardian)", points: displayPoints, badge: "⭐", isCurrentUser: true },
     { rank: 5, name: "David Plant", points: 2110, badge: "" },
-  ];
+  ]);
+
+  useEffect(() => {
+    // Update leaderboard when points change
+    setLeaderboard(prev => {
+      const updated = prev.map(user => 
+        user.isCurrentUser ? { ...user, points: displayPoints } : user
+      );
+      return updated.sort((a, b) => b.points - a.points).map((user, idx) => ({
+        ...user,
+        rank: idx + 1,
+        badge: idx === 0 ? "🏆" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : user.isCurrentUser ? "⭐" : ""
+      }));
+    });
+  }, [displayPoints]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +96,9 @@ const ImpactTracker = () => {
       toast.error("Please fill in all required fields");
       return;
     }
+
+    const currentRank = leaderboard.find(u => u.isCurrentUser)?.rank || 4;
+    setPreviousRank(currentRank);
 
     const pointsEarned = parseInt(quantity) * 10;
     const newTotal = points + pointsEarned;
@@ -314,7 +331,7 @@ const ImpactTracker = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 {leaderboard.map((user, index) => {
                   const isCurrentUser = user.isCurrentUser;
                   const rankChange = isCurrentUser && previousRank > user.rank ? previousRank - user.rank : 0;
@@ -324,29 +341,30 @@ const ImpactTracker = () => {
                       key={user.rank}
                       className={`flex items-center justify-between p-3 rounded-lg transition-all duration-500 ${
                         isCurrentUser
-                          ? "bg-primary/10 border-2 border-primary/50 shadow-[0_0_20px_rgba(0,255,65,0.3)] scale-105"
+                          ? "bg-primary/10 border-2 border-primary/50 shadow-[0_0_20px_rgba(0,255,65,0.3)]"
                           : "bg-muted/30 hover:bg-muted/50"
-                      }`}
+                      } ${isCurrentUser && rankChange > 0 ? 'animate-pulse' : ''}`}
                       style={{
-                        transform: isCurrentUser && rankChange > 0 ? 'translateY(-10px)' : 'translateY(0)',
+                        order: user.rank,
+                        transition: 'all 0.5s ease-in-out',
                       }}
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-2xl w-8 text-center">{user.badge || user.rank}</span>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className={`font-medium ${isCurrentUser ? "text-primary" : ""}`}>
+                            <p className={`font-medium ${isCurrentUser ? "text-primary font-bold" : ""}`}>
                               {user.name}
                             </p>
                             {isCurrentUser && rankChange > 0 && (
-                              <Badge className="bg-primary text-black animate-pulse">
+                              <Badge className="bg-primary text-black animate-bounce">
                                 ↑ +{rankChange}
                               </Badge>
                             )}
                           </div>
                         </div>
                       </div>
-                      <Badge variant={isCurrentUser ? "default" : "outline"}>
+                      <Badge variant={isCurrentUser ? "default" : "outline"} className={isCurrentUser ? "animate-pulse" : ""}>
                         {user.points.toLocaleString()} pts
                       </Badge>
                     </div>

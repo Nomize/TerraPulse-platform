@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGuest } from '@/contexts/GuestContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -14,6 +15,7 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
+  const { setGuestMode } = useGuest();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -157,7 +159,7 @@ export default function Login() {
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  localStorage.setItem('terrapulse_guest_mode', 'true');
+                  setGuestMode(true);
                   toast.info('Viewing as Guest - Sign up to save progress');
                   navigate('/dashboard');
                 }}
