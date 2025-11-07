@@ -24,10 +24,11 @@ const ImpactTracker = () => {
     open: false, 
     badge: null 
   });
-  const [activities, setActivities] = useState<Array<{ type: string; quantity: number; date: string }>>([
-    { type: "Tree Planting", quantity: 50, date: "2 days ago" },
-    { type: "Soil Testing", quantity: 5, date: "1 week ago" },
+  const [activities, setActivities] = useState<Array<{ type: string; quantity: number; date: string; timestamp?: Date }>>([
+    { type: "Tree Planting", quantity: 50, date: "2 days ago", timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
+    { type: "Soil Testing", quantity: 5, date: "1 week ago", timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
   ]);
+  const [currentStreak, setCurrentStreak] = useState(3);
 
   const [activityType, setActivityType] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -43,28 +44,56 @@ const ImpactTracker = () => {
       name: "Soil Guardian", 
       description: "Completed 10 soil tests", 
       earned: true,
-      progress: 100 
+      progress: 100,
+      type: "activity"
     },
     { 
       icon: TreeDeciduous, 
       name: "Reforestation Hero", 
       description: "Planted 100 trees", 
       earned: true,
-      progress: 100 
+      progress: 100,
+      type: "activity"
     },
     { 
       icon: Droplets, 
       name: "Water Warrior", 
       description: "Saved 1000L water", 
       earned: false,
-      progress: 65 
+      progress: 65,
+      type: "activity"
     },
     { 
       icon: Wheat, 
       name: "Crop Champion", 
       description: "Improved 5 hectares", 
       earned: false,
-      progress: 40 
+      progress: 40,
+      type: "activity"
+    },
+    {
+      icon: Award,
+      name: "Week Warrior",
+      description: "7-day activity streak",
+      earned: false,
+      progress: (currentStreak / 7) * 100,
+      type: "streak"
+    },
+    {
+      icon: Trophy,
+      name: "Monthly Master",
+      description: "30-day activity streak",
+      earned: false,
+      progress: (currentStreak / 30) * 100,
+      type: "streak"
+    },
+    {
+      icon: Award,
+      name: "Century Champion",
+      description: "100-day activity streak",
+      earned: false,
+      progress: (currentStreak / 100) * 100,
+      type: "streak"
     },
   ];
 
@@ -89,6 +118,43 @@ const ImpactTracker = () => {
       }));
     });
   }, [displayPoints]);
+
+  // Calculate streak from activities
+  const calculateStreak = (activitiesList: Array<{ timestamp?: Date }>) => {
+    if (activitiesList.length === 0) return 0;
+    
+    const sortedDates = activitiesList
+      .filter(a => a.timestamp)
+      .map(a => {
+        const date = new Date(a.timestamp!);
+        date.setHours(0, 0, 0, 0);
+        return date.getTime();
+      })
+      .sort((a, b) => b - a);
+    
+    if (sortedDates.length === 0) return 0;
+    
+    let streak = 1;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTime = today.getTime();
+    
+    // Check if most recent activity was today or yesterday
+    const daysDiff = Math.floor((todayTime - sortedDates[0]) / (24 * 60 * 60 * 1000));
+    if (daysDiff > 1) return 0; // Streak broken
+    
+    // Count consecutive days
+    for (let i = 0; i < sortedDates.length - 1; i++) {
+      const diff = Math.floor((sortedDates[i] - sortedDates[i + 1]) / (24 * 60 * 60 * 1000));
+      if (diff === 1) {
+        streak++;
+      } else if (diff > 1) {
+        break;
+      }
+    }
+    
+    return streak;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,16 +206,50 @@ const ImpactTracker = () => {
     }, duration / steps);
 
     setPoints((prev) => prev + pointsEarned);
-    setActivities([
-      { type: activityType, quantity: parseInt(quantity), date: "Just now" },
-      ...activities,
-    ]);
+    
+    const newActivity = { 
+      type: activityType, 
+      quantity: parseInt(quantity), 
+      date: "Just now",
+      timestamp: new Date()
+    };
+    
+    const updatedActivities = [newActivity, ...activities];
+    setActivities(updatedActivities);
+    
+    // Calculate new streak
+    const newStreak = calculateStreak(updatedActivities);
+    const oldStreak = currentStreak;
+    setCurrentStreak(newStreak);
 
     toast.success(`+${pointsEarned} Eco Points earned! 🌱`);
     
-    // Badge awarding logic based on activity type
-    const qty = parseInt(quantity);
+    // Check for streak badges
     let badgeToUnlock = null;
+    
+    if (newStreak >= 7 && oldStreak < 7) {
+      badgeToUnlock = {
+        icon: Award,
+        name: "Week Warrior",
+        description: "Completed 7-day streak!"
+      };
+    } else if (newStreak >= 30 && oldStreak < 30) {
+      badgeToUnlock = {
+        icon: Trophy,
+        name: "Monthly Master",
+        description: "Completed 30-day streak!"
+      };
+    } else if (newStreak >= 100 && oldStreak < 100) {
+      badgeToUnlock = {
+        icon: Award,
+        name: "Century Champion",
+        description: "Completed 100-day streak!"
+      };
+    }
+    
+    // Badge awarding logic based on activity type
+    if (!badgeToUnlock) {
+      const qty = parseInt(quantity);
     
     if (activityType === "Tree Planting" && qty >= 50) {
       badgeToUnlock = {
@@ -170,11 +270,12 @@ const ImpactTracker = () => {
         description: "Saved 1000L+ water"
       };
     } else if (activityType === "Composting" && qty >= 20) {
-      badgeToUnlock = {
-        icon: Wheat,
-        name: "Green Recycler",
-        description: "Composted 20+ times"
-      };
+        badgeToUnlock = {
+          icon: Wheat,
+          name: "Green Recycler",
+          description: "Composted 20+ times"
+        };
+      }
     }
     
     if (badgeToUnlock) {
@@ -256,6 +357,12 @@ const ImpactTracker = () => {
             </div>
 
             <div className="pt-4 border-t border-border space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Current Streak</span>
+                <span className="font-semibold flex items-center gap-1">
+                  🔥 {currentStreak} {currentStreak === 1 ? 'day' : 'days'}
+                </span>
+              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total Activities</span>
                 <span className="font-semibold">{activities.length + 12}</span>
