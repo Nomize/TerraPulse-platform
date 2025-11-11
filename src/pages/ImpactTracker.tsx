@@ -15,20 +15,19 @@ import { BadgeUnlockModal } from "@/components/BadgeUnlockModal";
 
 const ImpactTracker = () => {
   const { user } = useAuth();
-  const [points, setPoints] = useState(2450);
+  const [points, setPoints] = useState(0);
   const [showPointsAnim, setShowPointsAnim] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  const [displayPoints, setDisplayPoints] = useState(2450);
+  const [displayPoints, setDisplayPoints] = useState(0);
   const [previousRank, setPreviousRank] = useState(4);
   const [badgeModal, setBadgeModal] = useState<{ open: boolean; badge: any }>({ 
     open: false, 
     badge: null 
   });
-  const [activities, setActivities] = useState<Array<{ type: string; quantity: number; date: string; timestamp?: Date }>>([
-    { type: "Tree Planting", quantity: 50, date: "2 days ago", timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
-    { type: "Soil Testing", quantity: 5, date: "1 week ago", timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-  ]);
-  const [currentStreak, setCurrentStreak] = useState(3);
+  const [activities, setActivities] = useState<Array<{ type: string; quantity: number; date: string; timestamp?: Date }>>([]);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [activityType, setActivityType] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -40,58 +39,65 @@ const ImpactTracker = () => {
 
   const badges = [
     { 
+      id: "soil_guardian",
       icon: Sprout, 
       name: "Soil Guardian", 
       description: "Completed 10 soil tests", 
-      earned: true,
+      earned: unlockedBadges.includes("soil_guardian"),
       progress: 100,
       type: "activity"
     },
     { 
+      id: "reforestation_hero",
       icon: TreeDeciduous, 
       name: "Reforestation Hero", 
       description: "Planted 100 trees", 
-      earned: true,
+      earned: unlockedBadges.includes("reforestation_hero"),
       progress: 100,
       type: "activity"
     },
     { 
+      id: "water_warrior",
       icon: Droplets, 
       name: "Water Warrior", 
       description: "Saved 1000L water", 
-      earned: false,
+      earned: unlockedBadges.includes("water_warrior"),
       progress: 65,
       type: "activity"
     },
     { 
+      id: "crop_champion",
       icon: Wheat, 
       name: "Crop Champion", 
       description: "Improved 5 hectares", 
-      earned: false,
+      earned: unlockedBadges.includes("crop_champion"),
       progress: 40,
       type: "activity"
     },
     {
+      id: "week_warrior",
       icon: Award,
       name: "Week Warrior",
       description: "7-day activity streak",
-      earned: false,
+      earned: unlockedBadges.includes("week_warrior"),
       progress: (currentStreak / 7) * 100,
       type: "streak"
     },
     {
+      id: "monthly_master",
       icon: Trophy,
       name: "Monthly Master",
       description: "30-day activity streak",
-      earned: false,
+      earned: unlockedBadges.includes("monthly_master"),
       progress: (currentStreak / 30) * 100,
       type: "streak"
     },
     {
+      id: "century_champion",
       icon: Award,
       name: "Century Champion",
       description: "100-day activity streak",
-      earned: false,
+      earned: unlockedBadges.includes("century_champion"),
       progress: (currentStreak / 100) * 100,
       type: "streak"
     },
@@ -104,6 +110,84 @@ const ImpactTracker = () => {
     { rank: 4, name: "You (Earth Guardian)", points: displayPoints, badge: "⭐", isCurrentUser: true },
     { rank: 5, name: "David Plant", points: 2110, badge: "" },
   ]);
+
+  // Load user data from database
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Load user stats
+        const { data: stats, error: statsError } = await supabase
+          .from('user_stats')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (statsError) throw statsError;
+
+        if (stats) {
+          setPoints(stats.total_points);
+          setDisplayPoints(stats.total_points);
+          setCurrentStreak(stats.current_streak);
+        } else {
+          // Create initial stats record
+          await supabase.from('user_stats').insert({
+            user_id: user.id,
+            current_streak: 0,
+            longest_streak: 0,
+            total_points: 0
+          });
+        }
+
+        // Load badges
+        const { data: badgesData, error: badgesError } = await supabase
+          .from('user_badges')
+          .select('badge_id')
+          .eq('user_id', user.id);
+
+        if (badgesError) throw badgesError;
+
+        if (badgesData) {
+          setUnlockedBadges(badgesData.map(b => b.badge_id));
+        }
+
+        // Load activities
+        const { data: activitiesData, error: activitiesError } = await supabase
+          .from('activities')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (activitiesError) throw activitiesError;
+
+        if (activitiesData) {
+          const formattedActivities = activitiesData.map(a => ({
+            type: a.activity_type,
+            quantity: a.quantity,
+            date: new Date(a.created_at).toLocaleDateString(),
+            timestamp: new Date(a.created_at)
+          }));
+          setActivities(formattedActivities);
+          
+          // Recalculate streak from activities
+          const streak = calculateStreak(formattedActivities);
+          setCurrentStreak(streak);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        toast.error('Failed to load your data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserData();
+  }, [user]);
 
   useEffect(() => {
     // Update leaderboard when points change
@@ -172,6 +256,7 @@ const ImpactTracker = () => {
     // Save to database if user is logged in
     if (user) {
       try {
+        // Insert activity
         await supabase.from('activities').insert({
           user_id: user.id,
           activity_type: activityType,
@@ -180,8 +265,48 @@ const ImpactTracker = () => {
           points_earned: pointsEarned,
           details: `Logged ${quantity}x ${activityType}`
         });
+
+        // Update user stats
+        const today = new Date().toISOString().split('T')[0];
+        
+        const { data: currentStats } = await supabase
+          .from('user_stats')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        const lastActivityDate = currentStats?.last_activity_date;
+        let newStreak = 1;
+
+        if (lastActivityDate) {
+          const lastDate = new Date(lastActivityDate);
+          const todayDate = new Date(today);
+          const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (24 * 60 * 60 * 1000));
+
+          if (diffDays === 0) {
+            // Same day, maintain streak
+            newStreak = currentStats.current_streak;
+          } else if (diffDays === 1) {
+            // Consecutive day, increment streak
+            newStreak = currentStats.current_streak + 1;
+          }
+        }
+
+        await supabase
+          .from('user_stats')
+          .update({
+            total_points: newTotal,
+            current_streak: newStreak,
+            longest_streak: Math.max(newStreak, currentStats?.longest_streak || 0),
+            last_activity_date: today
+          })
+          .eq('user_id', user.id);
+
+        setCurrentStreak(newStreak);
       } catch (error) {
         console.error('Error saving activity:', error);
+        toast.error('Failed to save activity');
+        return;
       }
     }
     
@@ -226,59 +351,78 @@ const ImpactTracker = () => {
     
     // Check for streak badges
     let badgeToUnlock = null;
+    let badgeId = null;
     
-    if (newStreak >= 7 && oldStreak < 7) {
+    if (newStreak >= 7 && oldStreak < 7 && !unlockedBadges.includes("week_warrior")) {
       badgeToUnlock = {
         icon: Award,
         name: "Week Warrior",
         description: "Completed 7-day streak!"
       };
-    } else if (newStreak >= 30 && oldStreak < 30) {
+      badgeId = "week_warrior";
+    } else if (newStreak >= 30 && oldStreak < 30 && !unlockedBadges.includes("monthly_master")) {
       badgeToUnlock = {
         icon: Trophy,
         name: "Monthly Master",
         description: "Completed 30-day streak!"
       };
-    } else if (newStreak >= 100 && oldStreak < 100) {
+      badgeId = "monthly_master";
+    } else if (newStreak >= 100 && oldStreak < 100 && !unlockedBadges.includes("century_champion")) {
       badgeToUnlock = {
         icon: Award,
         name: "Century Champion",
         description: "Completed 100-day streak!"
       };
+      badgeId = "century_champion";
     }
     
     // Badge awarding logic based on activity type
     if (!badgeToUnlock) {
       const qty = parseInt(quantity);
     
-    if (activityType === "Tree Planting" && qty >= 50) {
-      badgeToUnlock = {
-        icon: TreeDeciduous,
-        name: "Forest Builder",
-        description: "Planted 50+ trees"
-      };
-    } else if (activityType === "Soil Testing" && qty >= 10) {
-      badgeToUnlock = {
-        icon: Sprout,
-        name: "Soil Guardian",
-        description: "Completed 10+ soil tests"
-      };
-    } else if (activityType === "Water Conservation" && qty >= 1000) {
-      badgeToUnlock = {
-        icon: Droplets,
-        name: "Water Warrior",
-        description: "Saved 1000L+ water"
-      };
-    } else if (activityType === "Composting" && qty >= 20) {
+      if (activityType === "Tree Planting" && qty >= 50 && !unlockedBadges.includes("reforestation_hero")) {
+        badgeToUnlock = {
+          icon: TreeDeciduous,
+          name: "Reforestation Hero",
+          description: "Planted 50+ trees"
+        };
+        badgeId = "reforestation_hero";
+      } else if (activityType === "Soil Testing" && qty >= 10 && !unlockedBadges.includes("soil_guardian")) {
+        badgeToUnlock = {
+          icon: Sprout,
+          name: "Soil Guardian",
+          description: "Completed 10+ soil tests"
+        };
+        badgeId = "soil_guardian";
+      } else if (activityType === "Water Conservation" && qty >= 1000 && !unlockedBadges.includes("water_warrior")) {
+        badgeToUnlock = {
+          icon: Droplets,
+          name: "Water Warrior",
+          description: "Saved 1000L+ water"
+        };
+        badgeId = "water_warrior";
+      } else if (activityType === "Composting" && qty >= 20 && !unlockedBadges.includes("crop_champion")) {
         badgeToUnlock = {
           icon: Wheat,
-          name: "Green Recycler",
+          name: "Crop Champion",
           description: "Composted 20+ times"
         };
+        badgeId = "crop_champion";
       }
     }
     
-    if (badgeToUnlock) {
+    if (badgeToUnlock && badgeId && user) {
+      // Save badge to database
+      try {
+        await supabase.from('user_badges').insert({
+          user_id: user.id,
+          badge_id: badgeId
+        });
+        setUnlockedBadges(prev => [...prev, badgeId]);
+      } catch (error) {
+        console.error('Error saving badge:', error);
+      }
+
       setTimeout(() => {
         setBadgeModal({
           open: true,
@@ -292,6 +436,17 @@ const ImpactTracker = () => {
     setQuantity("");
     setLocation("");
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading your impact data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
