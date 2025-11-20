@@ -18,6 +18,7 @@ import Dashboard from "./pages/Dashboard";
 import AIInsights from "./pages/AIInsights";
 import ImpactTracker from "./pages/ImpactTracker";
 import DataInsights from "./pages/DataInsights";
+import Achievements from "./pages/Achievements";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -92,6 +93,15 @@ const App = () => (
                 <div className="min-h-screen flex flex-col">
                   <Navbar />
                   <main className="flex-1"><Notifications /></main>
+                  <Footer />
+                </div>
+              </ProtectedRoute>
+            } />
+            <Route path="/achievements" element={
+              <ProtectedRoute>
+                <div className="min-h-screen flex flex-col">
+                  <Navbar />
+                  <main className="flex-1"><Achievements /></main>
                   <Footer />
                 </div>
               </ProtectedRoute>
