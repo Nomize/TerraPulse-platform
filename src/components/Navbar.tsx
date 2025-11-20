@@ -23,6 +23,7 @@ const Navbar = () => {
     { name: "AI Assistant", path: "/ai-insights" },
     { name: "Impact Tracker", path: "/impact-tracker" },
     { name: "Data Insights", path: "/data-insights" },
+    { name: "Achievements", path: "/achievements" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
