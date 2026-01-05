@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { 
-  TrendingUp, TrendingDown, Download, Droplets, FileText 
+  TrendingUp, TrendingDown, Download, Droplets, FileText, Beaker, Leaf, Sparkles 
 } from "lucide-react";
 import { toast } from "sonner";
 import { exportToCSV, exportToPDF } from "@/lib/export-utils";
@@ -16,6 +17,8 @@ import { GuestBanner } from "@/components/GuestBanner";
 const Dashboard = () => {
   const [soilHealth, setSoilHealth] = useState(73);
   const [lastUpdate, setLastUpdate] = useState(0);
+  const [showSoilDetailsModal, setShowSoilDetailsModal] = useState(false);
+  const [showSimulateModal, setShowSimulateModal] = useState(false);
 
   const handleExportCSV = () => {
     const data = [
@@ -213,7 +216,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <Button className="w-full">
+            <Button className="w-full" onClick={() => setShowSoilDetailsModal(true)}>
               View Details
             </Button>
           </CardContent>
@@ -319,12 +322,182 @@ const Dashboard = () => {
                 <option>Ethiopia</option>
               </select>
             </div>
-            <div className="flex-1 flex items-end">
-              <Button className="w-full">Apply Filters</Button>
+            <div className="flex-1 flex items-end gap-2">
+              <Button className="flex-1">Apply Filters</Button>
+              <Button variant="outline" onClick={() => setShowSimulateModal(true)}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Simulate Impact
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Soil Details Modal */}
+      <Dialog open={showSoilDetailsModal} onOpenChange={setShowSoilDetailsModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Beaker className="h-5 w-5 text-primary" />
+              Soil Health Details
+            </DialogTitle>
+            <DialogDescription>
+              Comprehensive soil analysis breakdown
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-muted/50">
+                <p className="text-sm text-muted-foreground">Overall Score</p>
+                <p className="text-2xl font-bold text-primary">{Math.round(soilHealth)}/100</p>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50">
+                <p className="text-sm text-muted-foreground">Health Status</p>
+                <Badge className="mt-1">{soilHealth >= 70 ? "Excellent" : soilHealth >= 40 ? "Moderate" : "Poor"}</Badge>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Leaf className="h-4 w-4 text-primary" />
+                Nutrient Levels
+              </h4>
+              <div className="space-y-2">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Nitrogen (N)</span>
+                    <span className="font-medium">45 ppm</span>
+                  </div>
+                  <Progress value={65} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Phosphorus (P)</span>
+                    <span className="font-medium">28 ppm</span>
+                  </div>
+                  <Progress value={52} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Potassium (K)</span>
+                    <span className="font-medium">180 ppm</span>
+                  </div>
+                  <Progress value={78} className="h-2" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Droplets className="h-4 w-4 text-primary" />
+                Physical Properties
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-lg border">
+                  <p className="text-xs text-muted-foreground">pH Level</p>
+                  <p className="font-semibold">6.8 (Optimal)</p>
+                </div>
+                <div className="p-3 rounded-lg border">
+                  <p className="text-xs text-muted-foreground">Moisture</p>
+                  <p className="font-semibold">42%</p>
+                </div>
+                <div className="p-3 rounded-lg border">
+                  <p className="text-xs text-muted-foreground">Organic Matter</p>
+                  <p className="font-semibold">3.2%</p>
+                </div>
+                <div className="p-3 rounded-lg border">
+                  <p className="text-xs text-muted-foreground">Texture</p>
+                  <p className="font-semibold">Loamy</p>
+                </div>
+              </div>
+            </div>
+
+            <Button className="w-full" onClick={() => {
+              handleDownloadReport();
+              setShowSoilDetailsModal(false);
+            }}>
+              <Download className="h-4 w-4 mr-2" />
+              Download Full Report
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Simulate Impact Modal */}
+      <Dialog open={showSimulateModal} onOpenChange={setShowSimulateModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Impact Simulation
+            </DialogTitle>
+            <DialogDescription>
+              See projected outcomes based on intervention scenarios
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 rounded-lg bg-primary/10 border border-primary/30">
+              <h4 className="font-semibold mb-3">Scenario: Cover Crop Implementation</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Soil Health</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">{Math.round(soilHealth)}</span>
+                    <TrendingUp className="h-4 w-4 text-status-healthy" />
+                    <span className="font-semibold text-status-healthy">{Math.round(soilHealth + 15)}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Erosion Rate</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">2.3 t/ha</span>
+                    <TrendingDown className="h-4 w-4 text-status-healthy" />
+                    <span className="font-semibold text-status-healthy">0.8 t/ha</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Carbon Sequestration</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">1.2 t/ha</span>
+                    <TrendingUp className="h-4 w-4 text-status-healthy" />
+                    <span className="font-semibold text-status-healthy">2.8 t/ha</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-lg bg-muted/50">
+              <h4 className="font-semibold mb-2">Projected Timeline</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">3 months</span>
+                  <span>Initial soil coverage established</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">6 months</span>
+                  <span>15% improvement in soil structure</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">12 months</span>
+                  <span>Full ecosystem benefits realized</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1" onClick={() => {
+                toast.success("Simulation saved to your projects!");
+                setShowSimulateModal(false);
+              }}>
+                Save Simulation
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => setShowSimulateModal(false)}>
+                Run Another
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
