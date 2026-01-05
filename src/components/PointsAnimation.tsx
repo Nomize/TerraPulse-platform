@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface PointsAnimationProps {
   value: number;
@@ -20,15 +21,62 @@ export const PointsAnimation = ({ value, show, onComplete }: PointsAnimationProp
     }
   }, [show, onComplete]);
 
-  if (!isVisible) return null;
-
   return (
-    <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-      <div className="animate-[float_2s_ease-out]">
-        <span className="text-6xl font-bold text-[#00FF41] drop-shadow-[0_0_30px_rgba(0,255,65,1)] animate-pulse">
-          +{value}
-        </span>
-      </div>
-    </div>
+    <AnimatePresence>
+      {isVisible && (
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.5 }}
+            animate={{ 
+              opacity: [0, 1, 1, 0], 
+              y: [50, 0, -50, -100], 
+              scale: [0.5, 1.2, 1.1, 1]
+            }}
+            exit={{ opacity: 0, y: -100 }}
+            transition={{ duration: 2, times: [0, 0.2, 0.5, 1] }}
+          >
+            <motion.span 
+              className="text-6xl font-bold text-[#00FF41]"
+              animate={{
+                textShadow: [
+                  "0 0 20px rgba(0,255,65,0.5)",
+                  "0 0 60px rgba(0,255,65,1)",
+                  "0 0 40px rgba(0,255,65,0.8)",
+                  "0 0 20px rgba(0,255,65,0.5)"
+                ]
+              }}
+              transition={{ duration: 1, repeat: 1 }}
+            >
+              +{value} pts
+            </motion.span>
+          </motion.div>
+          
+          {/* Particle effects */}
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-3 h-3 bg-primary rounded-full"
+              initial={{ 
+                opacity: 0, 
+                x: 0, 
+                y: 0,
+                scale: 0
+              }}
+              animate={{ 
+                opacity: [0, 1, 0], 
+                x: Math.cos((i / 8) * Math.PI * 2) * 100,
+                y: Math.sin((i / 8) * Math.PI * 2) * 100,
+                scale: [0, 1.5, 0]
+              }}
+              transition={{ 
+                duration: 1.5, 
+                delay: 0.2,
+                ease: "easeOut"
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </AnimatePresence>
   );
 };
