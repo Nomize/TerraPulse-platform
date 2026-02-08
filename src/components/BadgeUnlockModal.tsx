@@ -17,7 +17,7 @@ interface BadgeUnlockModalProps {
 export const BadgeUnlockModal = ({ open, onClose, badge }: BadgeUnlockModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0F1419] border-[#00FF41] max-w-md">
+      <DialogContent className="bg-card border-primary max-w-md">
         <div className="text-center space-y-6 py-8">
           {/* Animated badge icon */}
           <motion.div 
@@ -26,19 +26,19 @@ export const BadgeUnlockModal = ({ open, onClose, badge }: BadgeUnlockModalProps
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", damping: 10, stiffness: 100 }}
           >
-            <div className="absolute inset-0 bg-[#00FF41]/20 rounded-full animate-ping" />
+            <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
             <motion.div 
-              className="relative bg-gradient-to-br from-[#00FF41]/30 to-[#00FF41]/10 rounded-full p-8 inline-block"
+              className="relative bg-gradient-to-br from-primary/30 to-accent/20 rounded-full p-8 inline-block"
               animate={{ 
                 boxShadow: [
-                  "0 0 20px rgba(0,255,65,0.3)",
-                  "0 0 60px rgba(0,255,65,0.6)",
-                  "0 0 20px rgba(0,255,65,0.3)"
+                  "0 0 20px hsl(142 35% 40% / 0.3)",
+                  "0 0 40px hsl(142 35% 40% / 0.5)",
+                  "0 0 20px hsl(142 35% 40% / 0.3)"
                 ]
               }}
               transition={{ repeat: Infinity, duration: 2 }}
             >
-              <badge.icon className="h-24 w-24 text-[#00FF41]" />
+              <badge.icon className="h-24 w-24 text-primary" />
               {badge.emoji && (
                 <motion.span 
                   className="absolute -top-2 -right-2 text-4xl"
@@ -58,10 +58,10 @@ export const BadgeUnlockModal = ({ open, onClose, badge }: BadgeUnlockModalProps
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <h2 className="text-3xl font-bold text-[#00FF41]">
+            <h2 className="text-3xl font-bold text-primary">
               🎉 Badge Unlocked!
             </h2>
-            <h3 className="text-2xl font-semibold text-white flex items-center justify-center gap-2">
+            <h3 className="text-2xl font-semibold text-foreground flex items-center justify-center gap-2">
               {badge.emoji && <span>{badge.emoji}</span>}
               {badge.name}
             </h3>
@@ -76,14 +76,12 @@ export const BadgeUnlockModal = ({ open, onClose, badge }: BadgeUnlockModalProps
           >
             <Button 
               onClick={onClose}
-              className="bg-[#00FF41] text-black hover:bg-[#39FF14]"
             >
               Awesome!
             </Button>
             <Button 
               variant="outline"
               onClick={onClose}
-              className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41]/10"
             >
               Share
             </Button>

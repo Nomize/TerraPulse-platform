@@ -36,13 +36,13 @@ export const PointsAnimation = ({ value, show, onComplete }: PointsAnimationProp
             transition={{ duration: 2, times: [0, 0.2, 0.5, 1] }}
           >
             <motion.span 
-              className="text-6xl font-bold text-[#00FF41]"
+              className="text-6xl font-bold text-primary"
               animate={{
                 textShadow: [
-                  "0 0 20px rgba(0,255,65,0.5)",
-                  "0 0 60px rgba(0,255,65,1)",
-                  "0 0 40px rgba(0,255,65,0.8)",
-                  "0 0 20px rgba(0,255,65,0.5)"
+                  "0 0 20px hsl(142 35% 40% / 0.4)",
+                  "0 0 40px hsl(142 35% 40% / 0.7)",
+                  "0 0 30px hsl(142 35% 40% / 0.5)",
+                  "0 0 20px hsl(142 35% 40% / 0.4)"
                 ]
               }}
               transition={{ duration: 1, repeat: 1 }}
@@ -55,7 +55,7 @@ export const PointsAnimation = ({ value, show, onComplete }: PointsAnimationProp
           {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-3 h-3 bg-primary rounded-full"
+              className="absolute w-3 h-3 bg-accent rounded-full"
               initial={{ 
                 opacity: 0, 
                 x: 0, 
