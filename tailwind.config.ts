@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        heading: ['Poppins', 'Nunito', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Courier New', 'monospace'],
       },
       colors: {
@@ -75,13 +75,13 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        'glow': 'var(--shadow-glow)',
-        'glow-lg': 'var(--shadow-glow-lg)',
-        'glow-strong': 'var(--shadow-glow-strong)',
+        'soft': 'var(--shadow-soft)',
+        'medium': 'var(--shadow-medium)',
+        'strong': 'var(--shadow-strong)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'cyber-grid': 'linear-gradient(hsl(127 100% 50% / 0.1) 1px, transparent 1px), linear-gradient(90deg, hsl(127 100% 50% / 0.1) 1px, transparent 1px)',
+        'organic-pattern': 'radial-gradient(circle at 25% 25%, hsl(142 20% 85% / 0.3) 0%, transparent 30%), radial-gradient(circle at 75% 75%, hsl(42 30% 88% / 0.3) 0%, transparent 30%)',
       },
       keyframes: {
         "accordion-down": {
@@ -94,19 +94,15 @@ export default {
         },
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
         "fade-in": {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
-        "pulse-glow": {
-          '0%, 100%': { boxShadow: '0 0 20px hsl(127 100% 50% / 0.3)' },
-          '50%': { boxShadow: '0 0 40px hsl(127 100% 50% / 0.6)' },
-        },
-        scan: {
-          '0%': { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(100%)' },
+        grow: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
         },
       },
       animation: {
@@ -114,8 +110,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
         "fade-in": "fade-in 0.5s ease-out",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "scan": "scan 2s linear infinite",
+        "grow": "grow 2s ease-in-out infinite",
       },
     },
   },

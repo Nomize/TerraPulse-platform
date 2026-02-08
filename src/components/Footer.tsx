@@ -5,9 +5,9 @@ import { Input } from "./ui/input";
 
 const Footer = () => {
   return (
-    <footer className="border-t border-primary/20 bg-background relative overflow-hidden">
-      {/* Background glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none"></div>
+    <footer className="border-t border-border bg-card relative overflow-hidden">
+      {/* Organic background pattern */}
+      <div className="absolute inset-0 organic-pattern pointer-events-none"></div>
       
       <div className="container relative py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -16,18 +16,17 @@ const Footer = () => {
             <Link to="/" className="flex items-center space-x-2 group">
               <div className="relative">
                 <Leaf className="h-8 w-8 text-primary transition-transform group-hover:scale-110" />
-                <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/40 transition-all"></div>
               </div>
-              <span className="text-xl font-heading font-bold text-glow">TerraPulse</span>
+              <span className="text-xl font-heading font-bold text-foreground">TerraPulse</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              AI-Powered Land Regeneration Platform
+              Sustainable Land Regeneration Platform
             </p>
-            <p className="text-xs text-primary font-mono">
-              Built for LandReGen Hackathon
+            <p className="text-xs text-primary font-medium">
+              Growing Together for Tomorrow
             </p>
             <p className="text-xs text-muted-foreground">
-              Powered by Satellite Data, AI & Climate Passion
+              Empowering Farmers with Smart Insights
             </p>
           </div>
 
@@ -71,13 +70,13 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground mb-3">
               Get the latest insights on land regeneration
             </p>
-            <div className="flex gap-2">
+          <div className="flex gap-2">
               <Input
                 type="email"
                 placeholder="Email"
-                className="h-9 bg-background border-primary/20 focus:border-primary"
+                className="h-9 bg-background border-border focus:border-primary"
               />
-              <Button size="sm" className="shadow-glow hover:shadow-glow-lg transition-all">
+              <Button size="sm">
                 Subscribe
               </Button>
             </div>
@@ -85,7 +84,7 @@ const Footer = () => {
         </div>
 
         {/* Social Links */}
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-primary/20 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-border gap-4">
           <div className="flex items-center space-x-4">
             {[
               { icon: Mail, label: "Email" },
@@ -97,7 +96,7 @@ const Footer = () => {
                 key={label}
                 variant="ghost"
                 size="icon"
-                className="hover:bg-primary/10 hover:text-primary transition-all hover:scale-110"
+                className="hover:bg-primary/10 hover:text-primary transition-all"
                 aria-label={label}
               >
                 <Icon className="h-5 w-5" />
