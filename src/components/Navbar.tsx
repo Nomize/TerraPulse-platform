@@ -29,15 +29,14 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="container flex h-16 items-center justify-between">
-        {/* Logo with Pulsing Animation */}
+        {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 group">
           <div className="relative w-10 h-10">
-            <Leaf className="absolute inset-0 w-10 h-10 text-primary animate-pulse" />
-            <Leaf className="absolute inset-0 w-10 h-10 text-primary opacity-50 animate-ping" />
+            <Leaf className="absolute inset-0 w-10 h-10 text-primary" />
           </div>
-          <span className="text-xl font-heading font-bold text-white">TerraPulse</span>
+          <span className="text-xl font-heading font-bold text-foreground">TerraPulse</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -46,10 +45,10 @@ const Navbar = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 isActive(item.path)
                   ? "bg-primary/10 text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
               {item.name}
@@ -65,11 +64,11 @@ const Navbar = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="relative hover:bg-primary/10 hover:scale-110 transition-transform"
+            className="relative hover:bg-primary/10 transition-all"
             onClick={() => navigate('/notifications')}
           >
             <Bell className="h-5 w-5 text-primary" />
-            <span className="absolute top-0 right-0 min-w-[18px] h-[18px] bg-primary text-black text-xs font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,255,65,0.8)]">
+            <span className="absolute top-0 right-0 min-w-[18px] h-[18px] bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
               3
             </span>
           </Button>
@@ -79,48 +78,48 @@ const Navbar = () => {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="hover:bg-primary/10 hover:scale-110 transition-transform"
+                className="hover:bg-primary/10 transition-all"
               >
                 <div className="relative">
                   <User className="h-5 w-5 text-primary" />
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success border-2 border-background rounded-full"></div>
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success border-2 border-card rounded-full"></div>
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              className="w-56 bg-[#0F1419] border-primary/30 shadow-[0_0_20px_rgba(0,255,65,0.3)]"
+              className="w-56 bg-card border-border shadow-medium"
               align="end"
             >
               <DropdownMenuItem 
-                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+                className="hover:bg-muted focus:bg-muted cursor-pointer"
                 onClick={() => navigate('/profile')}
               >
                 <User className="mr-2 h-4 w-4 text-primary" />
-                <span>My Profile</span>
+                <span className="text-foreground">My Profile</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+                className="hover:bg-muted focus:bg-muted cursor-pointer"
                 onClick={() => navigate('/settings')}
               >
                 <Settings className="mr-2 h-4 w-4 text-primary" />
-                <span>Settings</span>
+                <span className="text-foreground">Settings</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+                className="hover:bg-muted focus:bg-muted cursor-pointer"
                 onClick={() => navigate('/dashboard')}
               >
                 <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
-                <span>Dashboard</span>
+                <span className="text-foreground">Dashboard</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer"
+                className="hover:bg-muted focus:bg-muted cursor-pointer"
               >
                 <HelpCircle className="mr-2 h-4 w-4 text-primary" />
-                <span>Help & Support</span>
+                <span className="text-foreground">Help & Support</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-primary/20" />
+              <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem 
-                className="hover:bg-[#1A1F26] focus:bg-[#1A1F26] cursor-pointer text-red-500"
+                className="hover:bg-muted focus:bg-muted cursor-pointer text-destructive"
                 onClick={() => signOut()}
               >
                 <LogOut className="mr-2 h-4 w-4" />
@@ -137,27 +136,27 @@ const Navbar = () => {
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-card border-primary/20">
+          <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-card border-border">
             <nav className="flex flex-col space-y-4 mt-8">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`px-4 py-3 rounded-md text-base font-medium transition-all ${
+                  className={`px-4 py-3 rounded-lg text-base font-medium transition-all ${
                     isActive(item.path)
                       ? "bg-primary/10 text-primary border-l-4 border-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
                   {item.name}
                 </Link>
               ))}
-              <div className="pt-4 border-t border-primary/20 space-y-2">
-                <Button variant="ghost" className="w-full justify-start hover:bg-primary/10">
+              <div className="pt-4 border-t border-border space-y-2">
+                <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 text-foreground">
                   <Bell className="mr-2 h-5 w-5" /> Notifications
                 </Button>
-                <Button variant="ghost" className="w-full justify-start hover:bg-primary/10">
+                <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 text-foreground">
                   <User className="mr-2 h-5 w-5" /> Profile
                 </Button>
               </div>
