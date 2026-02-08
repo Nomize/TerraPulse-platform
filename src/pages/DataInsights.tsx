@@ -143,7 +143,6 @@ const DataInsights = () => {
         <div className="flex gap-3">
           <Button 
             onClick={handleExportPDF}
-            className="bg-gradient-to-r from-[#00FF41] to-[#10B981] text-black hover:shadow-[0_0_30px_rgba(0,255,65,0.6)]"
           >
             <FileText className="h-4 w-4 mr-2" />
             Export PDF
@@ -151,7 +150,6 @@ const DataInsights = () => {
           <Button 
             variant="outline"
             onClick={() => exportToCSV(degradationByRegion, 'land_health_data')}
-            className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black"
           >
             <Download className="h-4 w-4 mr-2" />
             Export CSV
@@ -236,11 +234,11 @@ const DataInsights = () => {
 
         {/* Vegetation Analysis Tab */}
         <TabsContent value="vegetation" className="space-y-6 mt-6">
-          <Card className="bg-[#0F1419] border border-[#10B981]/30 hover:border-[#00FF41] transition-all">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-white">Vegetation Change Over Time</CardTitle>
+                  <CardTitle>Vegetation Change Over Time</CardTitle>
                   <CardDescription>Recovery and decline patterns by status</CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -248,7 +246,6 @@ const DataInsights = () => {
                     size="sm"
                     variant={viewMode === 'chart' ? 'default' : 'outline'}
                     onClick={() => setViewMode('chart')}
-                    className={viewMode === 'chart' ? 'bg-[#00FF41] text-black' : 'border-[#00FF41] text-[#00FF41]'}
                   >
                     <TrendingUp className="h-4 w-4 mr-1" />
                     Chart
@@ -257,7 +254,6 @@ const DataInsights = () => {
                     size="sm"
                     variant={viewMode === 'heatmap' ? 'default' : 'outline'}
                     onClick={() => setViewMode('heatmap')}
-                    className={viewMode === 'heatmap' ? 'bg-[#00FF41] text-black' : 'border-[#00FF41] text-[#00FF41]'}
                   >
                     <Grid3x3 className="h-4 w-4 mr-1" />
                     Heatmap
@@ -266,7 +262,6 @@ const DataInsights = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => exportToCSV(vegetationChange, 'vegetation_trends')}
-                    className="border-[#00FF41] text-[#00FF41]"
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -283,15 +278,15 @@ const DataInsights = () => {
                         <stop offset="95%" stopColor="hsl(var(--status-healthy))" stopOpacity={0.1}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1A1F26" />
-                    <XAxis dataKey="year" stroke="#A1A1AA" />
-                    <YAxis stroke="#A1A1AA" />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis dataKey="year" className="text-xs fill-muted-foreground" />
+                    <YAxis className="text-xs fill-muted-foreground" />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#0F1419",
-                        border: "2px solid #00FF41",
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
                         borderRadius: "8px",
-                        color: "white"
+                        color: "hsl(var(--foreground))"
                       }}
                     />
                     <Legend />
@@ -328,26 +323,26 @@ const DataInsights = () => {
                   {vegetationChange.map((yearData, idx) => (
                     <div key={yearData.year} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-white font-semibold">{yearData.year}</span>
-                        <span className="text-gray-400 text-sm">Total: 100%</span>
+                        <span className="text-foreground font-semibold">{yearData.year}</span>
+                        <span className="text-muted-foreground text-sm">Total: 100%</span>
                       </div>
-                      <div className="flex h-12 rounded-lg overflow-hidden border border-[#10B981]/30">
+                      <div className="flex h-12 rounded-lg overflow-hidden border border-border">
                         <div 
-                          className="bg-[#00E676] flex items-center justify-center text-black font-semibold text-sm transition-all hover:opacity-80"
+                          className="bg-status-healthy flex items-center justify-center text-white font-semibold text-sm transition-all hover:opacity-80"
                           style={{ width: `${yearData.healthy}%` }}
                           title={`Healthy: ${yearData.healthy}%`}
                         >
                           {yearData.healthy}%
                         </div>
                         <div 
-                          className="bg-[#FF8C00] flex items-center justify-center text-white font-semibold text-sm transition-all hover:opacity-80"
+                          className="bg-status-moderate flex items-center justify-center text-white font-semibold text-sm transition-all hover:opacity-80"
                           style={{ width: `${yearData.moderate}%` }}
                           title={`Moderate: ${yearData.moderate}%`}
                         >
                           {yearData.moderate}%
                         </div>
                         <div 
-                          className="bg-[#FF3B3B] flex items-center justify-center text-white font-semibold text-sm transition-all hover:opacity-80"
+                          className="bg-status-risk flex items-center justify-center text-white font-semibold text-sm transition-all hover:opacity-80"
                           style={{ width: `${yearData.degraded}%` }}
                           title={`Degraded: ${yearData.degraded}%`}
                         >
@@ -358,16 +353,16 @@ const DataInsights = () => {
                   ))}
                   <div className="grid grid-cols-3 gap-4 mt-6">
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#00E676] rounded"></div>
-                      <span className="text-white text-sm">Healthy</span>
+                      <div className="w-4 h-4 bg-status-healthy rounded"></div>
+                      <span className="text-foreground text-sm">Healthy</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#FF8C00] rounded"></div>
-                      <span className="text-white text-sm">Moderate Risk</span>
+                      <div className="w-4 h-4 bg-status-moderate rounded"></div>
+                      <span className="text-foreground text-sm">Moderate Risk</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#FF3B3B] rounded"></div>
-                      <span className="text-white text-sm">Degraded</span>
+                      <div className="w-4 h-4 bg-status-risk rounded"></div>
+                      <span className="text-foreground text-sm">Degraded</span>
                     </div>
                   </div>
                 </div>
@@ -461,9 +456,9 @@ const DataInsights = () => {
 
         {/* Upload Data Tab */}
         <TabsContent value="upload" className="space-y-6 mt-6">
-          <Card className="bg-[#0F1419] border border-[#10B981]/30 hover:border-[#00FF41] transition-all">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-white">Upload Your Data</CardTitle>
+              <CardTitle>Upload Your Data</CardTitle>
               <CardDescription>Upload CSV or Excel files for custom analysis</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -475,32 +470,32 @@ const DataInsights = () => {
                     onChange={handleFileUpload}
                     className="hidden"
                   />
-                  <div className="border-2 border-dashed border-[#10B981] rounded-xl p-12 text-center space-y-4 hover:border-[#00FF41] transition-all bg-[#1A1F26]">
-                    <Upload className="h-16 w-16 mx-auto text-[#00FF41]" />
+                  <div className="border-2 border-dashed border-border rounded-xl p-12 text-center space-y-4 hover:border-primary transition-all bg-muted/30">
+                    <Upload className="h-16 w-16 mx-auto text-primary" />
                     <div>
-                      <p className="text-white font-semibold text-lg mb-2">Upload Your Data</p>
-                      <p className="text-gray-400 text-sm">CSV, Excel files supported (Max 10MB)</p>
+                      <p className="text-foreground font-semibold text-lg mb-2">Upload Your Data</p>
+                      <p className="text-muted-foreground text-sm">CSV, Excel files supported (Max 10MB)</p>
                     </div>
-                    <div className="mt-4 bg-[#00FF41] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#39FF14] transition-all inline-block">
+                    <Button className="mt-4">
                       Choose File
-                    </div>
+                    </Button>
                   </div>
                 </label>
               ) : (
-                <div className="bg-[#1A1F26] border border-[#10B981]/30 rounded-xl p-8 text-center">
+                <div className="bg-muted/30 border border-border rounded-xl p-8 text-center">
                   {isProcessing ? (
                     <>
                       <div className="w-16 h-16 mx-auto mb-4 relative">
-                        <div className="absolute inset-0 border-4 border-[#00FF41] rounded-full border-t-transparent animate-spin"></div>
+                        <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
                       </div>
-                      <p className="text-white font-semibold mb-2">Processing {uploadedFile.name}...</p>
-                      <p className="text-gray-400 text-sm">Analyzing data structure</p>
+                      <p className="text-foreground font-semibold mb-2">Processing {uploadedFile.name}...</p>
+                      <p className="text-muted-foreground text-sm">Analyzing data structure</p>
                     </>
                   ) : (
                     <>
-                      <CheckCircle className="w-16 h-16 text-[#00FF41] mx-auto mb-4" />
-                      <p className="text-white font-semibold text-lg mb-2">Upload Successful!</p>
-                      <p className="text-[#00FF41] mb-4">{uploadedData?.length || 0} rows processed</p>
+                      <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
+                      <p className="text-foreground font-semibold text-lg mb-2">Upload Successful!</p>
+                      <p className="text-primary mb-4">{uploadedData?.length || 0} rows processed</p>
                       <div className="flex gap-3 justify-center">
                         <Button 
                           variant="outline"
@@ -508,11 +503,10 @@ const DataInsights = () => {
                             setUploadedFile(null);
                             setUploadedData(null);
                           }}
-                          className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black"
                         >
                           Upload Another
                         </Button>
-                        <Button className="bg-[#00FF41] text-black hover:bg-[#39FF14]">
+                        <Button>
                           Analyze Data →
                         </Button>
                       </div>
@@ -525,7 +519,6 @@ const DataInsights = () => {
                 <Button 
                   variant="outline"
                   onClick={handleDownloadSample}
-                  className="border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Download Sample Data

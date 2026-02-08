@@ -9,12 +9,12 @@ export const GuestBanner = () => {
   if (!isGuest) return null;
 
   return (
-    <Alert className="mb-4 bg-status-moderate/10 border-status-moderate">
-      <AlertCircle className="h-4 w-4 text-status-moderate" />
-      <AlertDescription className="flex items-center justify-between">
+    <Alert className="mb-4 bg-accent/10 border-accent">
+      <AlertCircle className="h-4 w-4 text-accent" />
+      <AlertDescription className="flex items-center justify-between text-foreground">
         <span>You're in Guest Mode - Sign up to save your progress</span>
         <Link to="/signup">
-          <Button size="sm" className="ml-4 bg-primary text-black hover:bg-primary/90">
+          <Button size="sm" className="ml-4">
             Create Account
           </Button>
         </Link>

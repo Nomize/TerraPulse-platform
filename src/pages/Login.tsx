@@ -5,7 +5,7 @@ import { useGuest } from '@/contexts/GuestContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, Mail, Lock, CheckCircle, XCircle, Leaf, MapPin, TrendingUp, Award, DollarSign } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Leaf, MapPin, TrendingUp, Award, Sprout, Tractor } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Login() {
@@ -42,70 +42,69 @@ export default function Login() {
     { icon: MapPin, title: 'Save Your Regions', description: 'Track multiple farm locations' },
     { icon: TrendingUp, title: 'Track Progress', description: 'See improvements over time' },
     { icon: Award, title: 'Earn Rewards', description: 'Badges and leaderboard rankings' },
-    { icon: DollarSign, title: 'Carbon Credits', description: 'Verify and monetize impact' }
+    { icon: Sprout, title: 'Grow Sustainably', description: 'Get personalized farming tips' }
   ];
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Animated grid background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#00FF4110_1px,transparent_1px),linear-gradient(to_bottom,#00FF4110_1px,transparent_1px)] bg-[size:4rem_4rem] animate-grid-flow" />
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Organic background pattern */}
+      <div className="absolute inset-0 organic-pattern" />
       
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      {/* Subtle farm decorations */}
+      <div className="absolute bottom-10 left-10 opacity-10">
+        <Tractor className="w-40 h-40 text-secondary" />
+      </div>
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
-        <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 bg-[#0F1419]/90 backdrop-blur-xl border border-[#10B981]/30 rounded-2xl p-8 shadow-[0_0_60px_rgba(0,255,65,0.2)]">
+        <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 bg-card/95 backdrop-blur-sm border border-border rounded-2xl p-8 shadow-medium">
           {/* Left Side - Login Form */}
           <div className="flex flex-col justify-center">
             {/* Logo */}
             <div className="flex items-center gap-3 mb-8">
               <div className="relative">
-                <Leaf className="w-10 h-10 text-[#00FF41] animate-pulse" />
-                <div className="absolute inset-0 w-10 h-10">
-                  <Leaf className="w-10 h-10 text-[#00FF41] opacity-50 animate-ping" />
-                </div>
+                <Leaf className="w-10 h-10 text-primary" />
               </div>
-              <span className="text-2xl font-bold text-white">
-                Terra<span className="text-[#00FF41]">Pulse</span>
+              <span className="text-2xl font-bold text-foreground">
+                Terra<span className="text-primary">Pulse</span>
               </span>
             </div>
 
-            <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-gray-400 mb-8">Monitor your land, track progress</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Welcome Back</h1>
+            <p className="text-muted-foreground mb-8">Monitor your land, track your progress</p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Input */}
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Email</label>
+                <label className="text-sm text-foreground font-medium mb-2 block">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="pl-10 bg-[#1A1F26] border-[#10B981]/50 text-white focus:border-[#00FF41] focus:shadow-[0_0_20px_rgba(0,255,65,0.3)]"
+                    className="pl-10 bg-background border-border text-foreground focus:border-primary"
                   />
                 </div>
               </div>
 
               {/* Password Input */}
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Password</label>
+                <label className="text-sm text-foreground font-medium mb-2 block">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="pl-10 pr-10 bg-[#1A1F26] border-[#10B981]/50 text-white focus:border-[#00FF41] focus:shadow-[0_0_20px_rgba(0,255,65,0.3)]"
+                    className="pl-10 pr-10 bg-background border-border text-foreground focus:border-primary"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#00FF41] transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -118,11 +117,11 @@ export default function Login() {
                   <Checkbox
                     checked={rememberMe}
                     onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                    className="border-[#00FF41]"
+                    className="border-primary data-[state=checked]:bg-primary"
                   />
-                  <span className="text-sm text-gray-400">Remember me</span>
+                  <span className="text-sm text-muted-foreground">Remember me</span>
                 </div>
-                <Link to="/forgot-password" className="text-sm text-[#00FF41] hover:text-[#39FF14] transition-colors">
+                <Link to="/forgot-password" className="text-sm text-primary hover:text-primary-dark transition-colors font-medium">
                   Forgot password?
                 </Link>
               </div>
@@ -131,12 +130,12 @@ export default function Login() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#00FF41] text-black font-bold hover:bg-[#39FF14] hover:shadow-[0_0_30px_rgba(0,255,65,0.6)] transition-all"
+                className="w-full"
                 size="lg"
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                     Signing in...
                   </div>
                 ) : (
@@ -147,10 +146,10 @@ export default function Login() {
               {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#10B981]/30"></div>
+                  <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-[#0F1419] text-gray-400">or continue as</span>
+                  <span className="px-2 bg-card text-muted-foreground">or continue as</span>
                 </div>
               </div>
 
@@ -163,16 +162,16 @@ export default function Login() {
                   toast.info('Viewing as Guest - Sign up to save progress');
                   navigate('/dashboard');
                 }}
-                className="w-full border-2 border-[#10B981]/50 text-gray-400 hover:border-[#00FF41] hover:text-[#00FF41] transition-all"
+                className="w-full"
                 size="lg"
               >
                 Continue as Guest
               </Button>
 
               {/* Sign Up Link */}
-              <p className="text-center text-sm text-gray-400">
+              <p className="text-center text-sm text-muted-foreground">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-[#00FF41] hover:text-[#39FF14] font-semibold transition-colors">
+                <Link to="/signup" className="text-primary hover:text-primary-dark font-semibold transition-colors">
                   Sign up
                 </Link>
               </p>
@@ -181,19 +180,19 @@ export default function Login() {
 
           {/* Right Side - Benefits */}
           <div className="hidden md:flex flex-col justify-center space-y-4">
-            <h3 className="text-2xl font-bold text-white mb-4">Why TerraPulse?</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-4">Why TerraPulse?</h3>
             {benefits.map((benefit, index) => (
               <div
                 key={index}
-                className="bg-[#1A1F26]/50 border border-[#10B981]/20 rounded-xl p-6 hover:border-[#00FF41] hover:bg-[#1A1F26]/70 hover:shadow-[0_0_30px_rgba(0,255,65,0.1)] transition-all group"
+                className="bg-background border border-border rounded-xl p-6 hover:border-primary hover:shadow-soft transition-all group"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-[#00FF41]/10 rounded-lg flex items-center justify-center group-hover:bg-[#00FF41]/20 transition-all">
-                    <benefit.icon className="w-6 h-6 text-[#00FF41]" />
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-all">
+                    <benefit.icon className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-white font-bold mb-1">{benefit.title}</h4>
-                    <p className="text-gray-400 text-sm">{benefit.description}</p>
+                    <h4 className="text-foreground font-bold mb-1">{benefit.title}</h4>
+                    <p className="text-muted-foreground text-sm">{benefit.description}</p>
                   </div>
                 </div>
               </div>
@@ -201,7 +200,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
